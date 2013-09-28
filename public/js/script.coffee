@@ -98,7 +98,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
   directive('photoInput', ($parse) ->
     console.log "in photoinput"
     restrict: 'EA'
-    template: "<input type='image' accept='image/*' capture='camera' />"
+    template: "<input type='file' accept='image/*' capture='camera' />"
     replace: true
     link: ($scope, element, attrs) ->
       console.log "link in photoinput"
@@ -418,7 +418,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         direction: $scope.order.direction
         content: $scope.message.content
         photo: $scope.message.photo
-        price: $scope.price
+        price: $scope.message.price
         hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
         poi: 
           name: $scope.me.order.place_name

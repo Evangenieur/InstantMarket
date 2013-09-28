@@ -61,24 +61,28 @@ block content
               span.message__user
                 a(ng-href="{{order.author.link}}",target="_blank")
                   {{order.author.username}}
-              p.message__content
-                {{order.type}}
-                {{order.direction}}
-                br
-                span(ng-bind-html-unsafe="order.content")
-                span  
-                  b {{order.price}}
                 a(href="#", class="message__hash",
                   ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
                     # {{ hash }}
+              p.message__content
+                span  is 
+                {{order.direction}}
+                span ing
+                span  a 
+                {{order.type}}
+                span  of 
+                span(ng-bind-html-unsafe="order.content")
+                span  for
+                span  
+                  b {{order.price}}
                 .rich-content(ng-bind-html-unsafe="order.rich")
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
                   {{order.poi.name}}
                 span.timeago(timeago="order.post_date")
 
-        .bottom-bar
-          button.btn.add(ng-click="toggleAddOrder()") Send your bid
+        .top-bar
+          button.btn.add(ng-click="toggleAddOrder()") Submit a bid
 
 
       pane(title="Map", ng-click="test()")
@@ -92,14 +96,16 @@ block content
             longitude="selected.longitude", 
             refresh="isMapVisible()", 
             mark-click="true")
-      pane(title="Me")
+      pane(title="About me")
 
-        h1 Who
         fieldset
-          legend Username / Company name
-          input(name="username",ng-model="me.username",placeholder="username here")
-          br
-          legend Order Position
+          span My name or business name is 
+          input(name="username",ng-model="me.username",placeholder="Your name here")
+          span  and I am located 
+          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+          label(for="my_position") at my current position
+          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+          label(for="company_position") or at this business location:  
           input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
 
           span.post__poi(ng-show='poiMessage.name.length > 0')
@@ -108,16 +114,12 @@ block content
           img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
           .poi-search(ng-class="{'is-hidden': !poiShow}")
             i.ss-icon search
-            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+            input#local_search(type="text", class="poi-search__input", placeholder="Type in your location", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
             ul.poi-search__results
               li(ng-repeat="result in poiResults")
                 span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
         
 
-          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
-          label(for="my_position") My position
-          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
-          label(for="company_position") Business location
 
         h1 My Orders
 
