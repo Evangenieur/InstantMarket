@@ -1,0 +1,15 @@
+html(ng-app="mymarket")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width")
+    meta(name="viewport", content="initial-scale=1.0, user-scalable=no")
+    each script in scripts
+      script(src=script)
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700', rel='stylesheet', type='text/css')
+    link(href='/css/main.css', rel='stylesheet', type='text/css')
+  body(ng-controller="AppCtrl")
+    header.header
+      h1.header__logo VisioTrade
+        span#city #{city} 
+        span#total_connected {{total_connected}}
+    block content

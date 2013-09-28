@@ -1,0 +1,88 @@
+extends layout
+
+block content
+  .app
+    tabs(pane-changed="paneChanged(selectedPane)")
+      pane(title="List")
+        .chat
+          ul.channels-list
+            li.chan(ng-repeat="chan in channels", ng-class="{'is-active': chan.joined == true}")
+              a(href="#" ,ng-click="toggleChannel(chan.name, $event)")
+                span.chan__name # {{chan.name}}
+                span.chan__nb-users
+                  i.ss-icon users
+                  {{chan.stats.users}}
+                span.chan__nb-pois(ng-if="chan.stats.pois > 0")
+                  i.ss-icon pin
+                  {{chan.stats.pois}}
+          ul.message-list-item(
+              ng-repeat="order in orders | matchCurrentChannels:current_channels | orderBy:'-post_date'",
+              ng-animate=" 'slide' "
+            )
+            li(class="message {{order.direction}}")
+              span.message__user
+                a(ng-href="{{order.author.link}}",target="_blank")
+                  {{order.author.username}}
+              p.message__content
+                {{order.type}}
+                {{order.direction}}
+                br
+                span(ng-bind-html-unsafe="order.content")
+                a(href="#", class="message__hash",
+                  ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
+                    # {{ hash }}
+                .rich-content(ng-bind-html-unsafe="order.rich")
+                span.poi-attach(ng-if="order.poi.name")
+                  i.ss-icon pin
+                  {{order.poi.name}}
+                span.timeago(timeago="order.post_date")
+
+        form.post(ng-submit="sendMessage()")
+          
+          .poi-search(ng-class="{'is-hidden': !poiShow}")
+            i.ss-icon search
+            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+            ul.poi-search__results
+              li(ng-repeat="result in poiResults")
+                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
+          
+          button.post__submit(type="submit")
+            i.ss-icon send
+            span Send
+          
+          .post__message
+
+            div(style="position: absolute; right: 50px;")
+              .btn-group
+                button.btn#service-btn(type="button",ng-click="order_set('type', 'service')") Service
+                button.btn(type="button",ng-click="order_set('type', 'product')") Product
+              .btn-group
+                button.btn(type="button",ng-click="order.set('direction', 'buy')") Buy
+                button.btn(type="button",ng-click="order.set('direction', 'sell')") Sell
+
+            textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your message here", enter-submit="sendMessage()")
+
+            span.post__poi(ng-show='poiMessage.name.length > 0')
+              i.ss-icon(ng-click="poiMessage.name = ''") delete
+              {{poiMessage.name}}
+            img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
+
+        form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
+          h3(class="modal__title") Merci de rentrer ton pseudo
+          input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
+          br
+          input(type="submit", value="Valider", class="modal__submit")
+      pane(title="Maps", ng-click="test()")
+        .map
+          google-map(
+            center="center", 
+            draggable="true", 
+            zoom="zoom", 
+            markers="markers", 
+            latitude="selected.latitude", 
+            longitude="selected.longitude", 
+            refresh="isMapVisible()", 
+            mark-click="true")
+      pane(title="My orders")
+
+

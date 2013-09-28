@@ -1,0 +1,33 @@
+{
+  "name": "InstantMarket",
+  "version": "0.0.1",
+  "description": "WebRTC Real-time P2P Local MarketPlace",
+  "main": "server.coffee",
+  "dependencies": {
+    "zappajs": "~0.4.22",
+    "colors": "~0.6.2",
+    "optimist": "~0.6.0",
+    "browserify-middleware": "~1.18.0",
+    "duplex": "~1.0.0",
+    "underscore": "~1.5.2",
+    "crdt": "~3.5.4",
+    "jade": "~0.35.0",
+    "request": "~2.27.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Evangenieur/InstantMarket.git"
+  },
+  "author": "",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "c1dd97c83bab9d6018c292b3475d98aa6eb8f2eb",
+  "bugs": {
+    "url": "https://github.com/Evangenieur/InstantMarket/issues"
+  }
+}
