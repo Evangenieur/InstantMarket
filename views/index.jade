@@ -32,10 +32,10 @@ block content
                 | It is a 
                 input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here", size="50")
                 br
-                | I sell it for 
+                | My bid is  
                 input(ng-model="message.price",placeholder="enter your price here")
                 br
-                | It looks like 
+                | and it looks like 
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
               input(type="submit", value="Submit", class="modal__submit")
