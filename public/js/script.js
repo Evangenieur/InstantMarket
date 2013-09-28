@@ -63,6 +63,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       var panes;
       panes = $scope.panes = [];
       $scope.select = function(pane) {
+        console.log("select pane", pane.title, pane);
         angular.forEach(panes, function(pane) {
           return pane.selected = false;
         });
@@ -284,22 +285,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     price: ""
   };
   $scope.notifs = [];
-  /*
-  i = 1
-  setInterval ->
-    console.log "Interval ding dong"
-    $scope.messages.push 
-      id: i
-      author: "test"
-      content: "test #{i++}" 
-      hashtags: []
-      poi: null
-      post_date: (new Date()).getTime()
-    $scope.$digest()
-  
-  , 1500
-  */
-
   $scope.clickBuy = function() {
     console.log("clickBuy", $scope.panelAddShow);
     if ($scope.panelAddShow) {
@@ -322,6 +307,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     username: "",
     avatar: "",
     userAgent: navigator.userAgent,
+    stream: null,
+    cam_enabled: null,
+    audio: null,
     order: {
       place_name: "",
       position_type: "mine",
@@ -510,6 +498,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       hashtag = hashtags[_i];
       doc = $scope.Hashtags.get(hashtag);
       stats = doc.get("stats");
+      stats || (stats = {});
       stats.users++;
       doc.set("stats", stats);
     }
@@ -526,7 +515,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       price: $scope.message.price,
       hashtags: hashtags,
       poi: {
-        name: $scope.me.order.place_name,
+        name: $scope.me.order.place_name || $scope.me.username + "'s place",
         coord: $scope.me.order.position_type === "mine" ? $scope.me.coord : $scope.me.order.coord
       },
       post_date: now = (new Date()).toISOString(),
@@ -566,6 +555,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   };
   socket.on("connect", function() {
     var current_channel;
+    socket.emit("identity", {
+      id: $scope.me.id
+    });
     sharedDocs.forEach(function(doc_name) {
       $scope[doc_name] = sharedDoc(doc_name);
       switch (doc_name) {
@@ -745,10 +737,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       return scope.$watch(attrs.timeago, updateTime);
     }
   };
-}).controller('ChatCtrl', function($scope, $filter, socket) {
+}).controller('ChatCtrl', function($scope, $filter, socket, webrtc) {
   console.log("ChatCtrl", window.scope2 = $scope);
   $scope.text = "";
-  return $scope.sendTxt = function() {
+  $scope.sendTxt = function() {
     var chats, doc, now;
     if ($scope.text === "") {
       return;
@@ -768,5 +760,376 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     doc.set("chats", chats);
     doc.set("update_date", now);
     return $scope.text = "";
+  };
+  $scope.visio_call = function() {
+    var doc;
+    console.log("visio_call");
+    doc = $scope.MarketOrders.get($scope.chat.order.id);
+    doc.set("update_date", (new Date()).toISOString());
+    $scope.users.push($scope.chat.order.author);
+    webrtc.users_to_call.push($scope.chat.order.author.id);
+    return $scope.toggleCam();
+  };
+  $scope.users = [$scope.me];
+  /* WEBRTC*/
+
+  $scope.cam = {
+    available: false,
+    activated: false,
+    enabled: false
+  };
+  $scope.mic = {
+    enabled: false,
+    activated: false
+  };
+  if (!webrtc.not_supported) {
+    $scope.cam.available = true;
+    $scope.$watch("users", function(neww, old, scope) {
+      var diff_ids, new_ids, old_ids;
+      new_ids = _(neww).pluck("id");
+      old_ids = _(old).pluck("id");
+      diff_ids = _(new_ids).difference(old_ids);
+      console.log("users changed", diff_ids);
+      return _(diff_ids).each(function(user_id) {
+        if (user_id !== $scope.me.id) {
+          if (new_ids.indexOf(user_id) !== -1) {
+            console.log("new peer", user_id);
+            return webrtc.join(user_id);
+          } else if (old_ids.indexOf(user_id) !== -1) {
+            console.log("old peer", user_id);
+            return webrtc.removePeers(user_id);
+          } else {
+            return console.log("WTF", user_id);
+          }
+        }
+      });
+    }, true);
+    webrtc.on_my_camera = function(my_video) {
+      var me_in_list;
+      console.log("ON_MY_CAM o/");
+      me_in_list = _($scope.users).find(function(user) {
+        return user.id === $scope.me.id;
+      });
+      me_in_list.stream = my_video;
+      me_in_list.audio = false;
+      $scope.cam.activated = true;
+      $scope.cam.enabled = true;
+      return $scope.mic.activated = true;
+    };
+    webrtc.on_remote_camera = function(peer) {
+      var remote_in_list;
+      console.log("\\o/ REMOTE CAM", arguments);
+      remote_in_list = _($scope.users).find(function(user) {
+        return user.id === peer.id;
+      });
+      remote_in_list.stream = peer.stream;
+      return $timeout(function() {
+        return remote_in_list.audio = true;
+      }, 1000);
+    };
+    webrtc.out_message = function(msg) {
+      console.log("WEBRTC.OUT", msg.type);
+      return socket.emit("message", msg);
+    };
+    socket.on("message", function(msg) {
+      console.log("WEBRTC.IN", msg.type, msg);
+      if (!_($scope.users).find(function(user) {
+        return msg.from === user.id;
+      })) {
+        $scope.users.push({
+          id: msg.from
+        });
+      }
+      return webrtc.in_message(msg);
+    });
+    $scope.toggleCam = function() {
+      var me_in_list;
+      if (webrtc.started) {
+        $scope.cam.enabled = webrtc.toggleCam();
+        me_in_list = _($scope.users).find(function(user) {
+          return user.id === $scope.me.id;
+        });
+        if ($scope.cam.enabled) {
+          return me_in_list.cam_enabled = true;
+        } else {
+          return me_in_list.cam_enabled = false;
+        }
+      } else {
+        return webrtc.init("small");
+      }
+    };
+    $scope.toggleMic = function() {
+      console.log("toggleMic");
+      if ($scope.mic.enabled = webrtc.toggleMic()) {
+        $scope.previous_volume = player.getVolume();
+        console.log("getting previous_volume", $scope.previous_volume);
+        return player.setVolume(low_volume);
+      } else {
+        console.log("setting previous_volume", $scope.previous_volume);
+        return player.setVolume($scope.previous_volume);
+      }
+    };
+    if ($scope.chat.order.author.id === $scope.me.id) {
+      return $scope.toggleCam();
+    }
+  }
+  /* /WEBRTC*/
+
+}).directive('camera', function() {
+  return {
+    restrict: "E",
+    replace: true,
+    template: "<video></video>",
+    transclude: true,
+    scope: {
+      stream: "=",
+      audio: "=",
+      show: "="
+    },
+    link: function(scope, element, attrs) {
+      scope.$watch("show", function(neww, old, scope) {
+        var video;
+        video = element[0];
+        console.log("on show change", neww, old);
+        return video.style.display = neww ? "" : "none";
+      });
+      scope.$watch("audio", function(neww, old, scope) {
+        var video;
+        video = element[0];
+        return video.muted = !neww;
+      });
+      return scope.$watch("stream", function(neww, old, scope) {
+        var e, video;
+        video = element[0];
+        console.log("watch stream", arguments);
+        if (!neww) {
+          $(video).css("display", "none");
+          return;
+        }
+        $(video).css("display", "");
+        try {
+          if (URL && URL.createObjectURL) {
+            video.src = URL.createObjectURL(neww);
+          } else if (element.srcObject) {
+            video.srcObject = neww;
+          } else if (element.mozSrcObject) {
+            video.mozSrcObject = neww;
+          }
+        } catch (_error) {
+          e = _error;
+          console.log("Error", e);
+        }
+        return video.muted = true;
+      });
+    }
+  };
+}).factory('webrtc', function($rootScope) {
+  var e, events, parser, peerConnectionConfig, ua;
+  peerConnectionConfig = {
+    iceServers: [
+      {
+        url: "stun:stun.l.google.com:19302"
+      }
+    ]
+  };
+  parser = new UAParser();
+  ua = parser.getResult();
+  console.log(ua);
+  if (ua.browser.name.match(/Chrom(e|ium)/)) {
+    peerConnectionConfig.iceServers.push({
+      url: "turn:test@watsh.tv:3478",
+      credential: "test"
+    });
+  } else if (ua.browser.name.match(/Firefox/)) {
+    if (parseFloat(ua.browser.version) >= 24.00) {
+      peerConnectionConfig.iceServers.push({
+        url: "turn:watsh.tv:3478",
+        credential: "test",
+        username: "test"
+      });
+    } else {
+      return {
+        not_supported: true
+      };
+    }
+  }
+  try {
+    window.webrtc = new WebRTC({
+      peerConnectionConfig: peerConnectionConfig,
+      url: window.location.host,
+      debug: true
+    });
+  } catch (_error) {
+    e = _error;
+    return {
+      not_supported: true
+    };
+  }
+  webrtc.on("message", function(msg) {
+    return typeof events.out_message === "function" ? events.out_message(msg) : void 0;
+  });
+  webrtc.on("peerStreamAdded", function(peer) {
+    peer.stream.onended = function() {
+      return console.log("Stream ended");
+    };
+    peer.stream.onremovetrack = function() {
+      return console.log("Track ended");
+    };
+    return $rootScope.$apply(function() {
+      return typeof events.on_remote_camera === "function" ? events.on_remote_camera(peer) : void 0;
+    });
+  });
+  webrtc.on("peerStreamRemoved", function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return console.log("peerStreamRemoved", arguments);
+  });
+  return window.webrtc_a = events = {
+    started: false,
+    users: [],
+    waiting_msgs: [],
+    users_to_call: [],
+    on_my_camera: null,
+    on_remote_camera: null,
+    out_message: null,
+    init: function(cam_resolution) {
+      if (cam_resolution == null) {
+        cam_resolution = "small";
+      }
+      return webrtc.startLocalMedia({
+        video: {
+          mandatory: (function() {
+            switch (cam_resolution) {
+              case "small":
+                return {
+                  maxWidth: 320,
+                  maxHeight: 240
+                };
+              case "medium":
+                return {
+                  maxWidth: 640,
+                  maxHeight: 480
+                };
+            }
+          })()
+        },
+        audio: true
+      }, function(err, stream) {
+        console.log("CAM INIT");
+        if (err) {
+          console.log(err);
+          return;
+        }
+        return $rootScope.$apply(function() {
+          var _ref;
+          if ((_ref = events.on_my_camera) != null) {
+            _ref.call(events, stream);
+          }
+          return events.ready();
+        });
+      });
+    },
+    in_message: function(msg) {
+      var peers;
+      console.log("in_message, @started?", this.started);
+      if (!this.started) {
+        this.waiting_msgs.push(msg);
+        return;
+      }
+      peers = webrtc.getPeers(msg.from);
+      console.log("on message", msg.type, peers.length);
+      if (!peers.length) {
+        this.add_peer(msg.from);
+        peers = webrtc.getPeers(msg.from);
+      }
+      /*
+      if msg.type is "offer"
+        peer = webrtc.createPeer 
+          id: msg.from
+        peer.handleMessage msg
+      else
+      */
+
+      return _(peers).each(function(peer) {
+        return peer.handleMessage(msg);
+      });
+    },
+    on: function() {
+      var args;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return webrtc.on.apply(webrtc, args);
+    },
+    join: function(user_id) {
+      if (webrtc.localStream) {
+        return this.add_peer(user_id);
+      } else {
+        return this.users.push(user_id);
+      }
+    },
+    ready: function() {
+      var msg, user_id, _results;
+      console.log("READY");
+      this.started = true;
+      while (user_id = this.users.pop()) {
+        this.add_peer(user_id);
+      }
+      while (user_id = this.users_to_call.pop()) {
+        console.log("Calling", user_id);
+        this.call_peer(user_id);
+      }
+      _results = [];
+      while (msg = this.waiting_msgs.shift()) {
+        _results.push(this.in_message(msg));
+      }
+      return _results;
+    },
+    add_peer: function(user_id) {
+      var _ref;
+      if (!((_ref = webrtc.getPeers(user_id)) != null ? _ref.length : void 0)) {
+        return webrtc.createPeer({
+          id: user_id
+        });
+      }
+    },
+    call_peer: function(user_id) {
+      var peers;
+      console.log("Calling " + user_id);
+      peers = webrtc.getPeers(user_id);
+      console.log("peers", peers);
+      return _(peers).each(function(peer) {
+        console.log(">Calling " + user_id);
+        return peer.start();
+      });
+    },
+    stop: function() {
+      var peers;
+      this.started = false;
+      peers = webrtc.getPeers();
+      return _(peers).each(function(peer) {
+        return peer.end();
+      });
+    },
+    toggleCam: function() {
+      var video;
+      video = webrtc.localStream.getVideoTracks()[0];
+      return video.enabled = !video.enabled;
+    },
+    toggleMic: function() {
+      var audio;
+      audio = webrtc.localStream.getAudioTracks()[0];
+      return audio.enabled = !audio.enabled;
+    },
+    start: function(users) {
+      if (webrtc.localStream) {
+        if (typeof this.on_my_camera === "function") {
+          this.on_my_camera(webrtc.localStream);
+        }
+        this.users = this.users.concat(users);
+        this.users_to_call = this.users_to_call.concat(users);
+        return this.ready();
+      } else {
+        return this.start_cam();
+      }
+    }
   };
 });

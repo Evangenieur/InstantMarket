@@ -88,6 +88,8 @@ require("zappajs") PORT, ->
       "/js/fastclick.js"
       "/js/bundle.js"
       "/js/shared.js"
+      "/js/webrtc.bundle.js"
+      "/js/ua-parser.min.js"
       "/js/script.js"
     ]    
   ).defaults mymarket
@@ -158,7 +160,24 @@ require("zappajs") PORT, ->
      
     ]
 
+  user_id2socket_id = {}
+  socket_id2user_id = {}
   ### RT COMM ###
   @on connection: ->
     console.log "connected"
     init_crdt_streams_over_socket_io(@socket)
+
+  @on identity: ->
+    console.log "new identity", @data.id, "=", @id
+    user_id2socket_id[@data.id] = @id
+    socket_id2user_id[@id] = @data.id
+
+  # One2One for WebRTC Nego
+  @on message: ->
+    otherClient = @io.sockets.sockets[user_id2socket_id[@data.to]]
+    console.log "message from", @id, @data, otherClient?
+    return unless otherClient
+    delete @data.to
+    @data.from = socket_id2user_id[@id]
+    otherClient.emit "message", @data
+

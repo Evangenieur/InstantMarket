@@ -54,6 +54,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       panes = $scope.panes = []
 
       $scope.select = (pane) ->
+        console.log "select pane", pane.title, pane
         angular.forEach panes, (pane) ->
           pane.selected = false
         pane.selected = true
@@ -238,22 +239,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       price: ""
     $scope.notifs = []
 
-    ###
-    i = 1
-    setInterval ->
-      console.log "Interval ding dong"
-      $scope.messages.push 
-        id: i
-        author: "test"
-        content: "test #{i++}" 
-        hashtags: []
-        poi: null
-        post_date: (new Date()).getTime()
-      $scope.$digest()
-
-    , 1500
-    ###
-
+  
     $scope.clickBuy = ->
       console.log "clickBuy", $scope.panelAddShow
       if $scope.panelAddShow
@@ -274,6 +260,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       username: ""
       avatar: ""
       userAgent: navigator.userAgent
+      stream: null
+      cam_enabled: null
+      audio: null
       order: 
         place_name: ""
         position_type: "mine"
@@ -442,6 +431,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       for hashtag in hashtags
         doc = $scope.Hashtags.get(hashtag)
         stats = doc.get "stats"
+        stats or= {}
         stats.users++
         doc.set "stats", stats
 
@@ -457,7 +447,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         price: $scope.message.price
         hashtags: hashtags
         poi: 
-          name: $scope.me.order.place_name
+          name: $scope.me.order.place_name or $scope.me.username + "'s place"
           coord: if $scope.me.order.position_type is "mine"
               $scope.me.coord
             else
@@ -490,6 +480,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
 
     socket.on "connect", ->
+      socket.emit "identity", id: $scope.me.id
 
       sharedDocs.forEach (doc_name) ->
         $scope[doc_name] = sharedDoc doc_name
@@ -615,8 +606,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           $timeout(updateTime, 15000)
       scope.$watch(attrs.timeago, updateTime);
   ).
-  controller('ChatCtrl', ($scope, $filter, socket) ->
+  controller('ChatCtrl', ($scope, $filter, socket, webrtc) ->
     console.log "ChatCtrl", window.scope2 = $scope
+    
     $scope.text = ""
     $scope.sendTxt = ->
       return if $scope.text is ""
@@ -633,5 +625,306 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       doc.set "chats", chats
       doc.set "update_date", now
       $scope.text = ""
-  )
 
+    $scope.visio_call = ->
+      console.log "visio_call"
+      doc = $scope.MarketOrders.get($scope.chat.order.id)
+      doc.set "update_date", (new Date()).toISOString()
+      $scope.users.push $scope.chat.order.author
+      webrtc.users_to_call.push $scope.chat.order.author.id
+      $scope.toggleCam()
+
+    $scope.users = [
+      $scope.me
+    ]
+    ### WEBRTC ###
+    $scope.cam =
+      available: false
+      activated: false
+      enabled: false
+
+    $scope.mic =
+      enabled: false 
+      activated: false
+
+    if not webrtc.not_supported
+
+      $scope.cam.available = true 
+      $scope.$watch "users", (neww, old, scope) ->
+          new_ids = _(neww).pluck "id"
+          old_ids = _(old).pluck "id"
+          diff_ids = _(new_ids).difference(old_ids)
+
+          console.log "users changed", diff_ids
+
+          _(diff_ids).each (user_id) ->
+            if user_id isnt $scope.me.id
+              if new_ids.indexOf(user_id) isnt -1
+                console.log "new peer", user_id
+                webrtc.join user_id
+              else if old_ids.indexOf(user_id) isnt -1
+                console.log "old peer", user_id
+                webrtc.removePeers user_id
+              else 
+                console.log "WTF", user_id
+
+      , true
+
+      webrtc.on_my_camera = (my_video) ->
+        console.log "ON_MY_CAM o/"
+        me_in_list = _($scope.users).find (user) -> user.id is $scope.me.id
+        me_in_list.stream = my_video
+        me_in_list.audio = false
+        $scope.cam.activated = true
+        $scope.cam.enabled = true
+        $scope.mic.activated = true
+        #$scope.mic.enabled = webrtc.toggleMic()
+
+      webrtc.on_remote_camera = (peer) ->
+        console.log "\\o/ REMOTE CAM", arguments
+        remote_in_list = _($scope.users).find (user) -> user.id is peer.id
+        remote_in_list.stream = peer.stream
+        $timeout ->
+            remote_in_list.audio = true
+          , 1000
+
+      webrtc.out_message = (msg) ->
+        console.log "WEBRTC.OUT", msg.type
+        socket.emit "message", msg
+      
+
+      socket.on "message", (msg) ->
+        console.log "WEBRTC.IN", msg.type, msg
+        unless _($scope.users).find( (user) -> msg.from is user.id )
+          $scope.users.push 
+            id: msg.from
+        webrtc.in_message msg
+
+      $scope.toggleCam = ->
+        if webrtc.started
+          $scope.cam.enabled = webrtc.toggleCam()
+          me_in_list = _($scope.users).find (user) -> user.id is $scope.me.id
+          if $scope.cam.enabled
+            me_in_list.cam_enabled = true
+          else
+            me_in_list.cam_enabled = false
+        else
+          webrtc.init "small"
+
+      $scope.toggleMic = ->
+        console.log "toggleMic"
+        
+        if $scope.mic.enabled = webrtc.toggleMic()
+          $scope.previous_volume = player.getVolume()
+          console.log "getting previous_volume", $scope.previous_volume
+          player.setVolume(low_volume)
+        else
+          console.log "setting previous_volume", $scope.previous_volume
+          player.setVolume( $scope.previous_volume )
+
+      if $scope.chat.order.author.id is $scope.me.id
+        $scope.toggleCam()
+ 
+    ### /WEBRTC ###
+  )
+  .directive 'camera', ->
+    restrict: "E"
+    replace: true
+    template: "<video></video>"
+    transclude: true
+    scope: 
+      stream: "="
+      audio: "="
+      show: "="
+    link: (scope, element, attrs) ->
+      
+      scope.$watch "show", (neww, old, scope) ->
+        video = element[0]
+        console.log "on show change", neww, old
+        video.style.display = if neww then "" else "none"
+
+      scope.$watch "audio", (neww, old, scope) ->
+        video = element[0]
+        video.muted = !neww
+      
+      scope.$watch "stream", (neww, old, scope) ->
+        video = element[0]
+        #return unless neww
+        console.log "watch stream", arguments
+        unless neww
+          $(video).css "display", "none"
+          return              
+
+        $(video).css "display", ""
+
+        try 
+          if URL and URL.createObjectURL
+            video.src = URL.createObjectURL(neww)
+          else if element.srcObject
+            video.srcObject = neww
+          else if element.mozSrcObject
+            video.mozSrcObject = neww
+        catch e
+          console.log "Error", e
+
+        video.muted = true
+
+  .factory 'webrtc', ($rootScope) ->
+    peerConnectionConfig = 
+      iceServers: [
+        { url: "stun:stun.l.google.com:19302"}
+      ]
+
+    parser = new UAParser()
+    ua = parser.getResult()
+    console.log ua
+    
+    if ua.browser.name.match(/Chrom(e|ium)/)
+      peerConnectionConfig.iceServers.push 
+        url: "turn:test@watsh.tv:3478"
+        credential: "test"
+    else if ua.browser.name.match(/Firefox/)
+      if parseFloat(ua.browser.version) >= 24.00
+        peerConnectionConfig.iceServers.push 
+          url: "turn:watsh.tv:3478"
+          credential: "test"
+          username: "test"
+      else
+        return not_supported: true
+
+    try 
+      window.webrtc = new WebRTC
+        peerConnectionConfig: peerConnectionConfig
+        url: window.location.host
+        debug: true
+    catch e
+      return not_supported: true
+
+    webrtc.on "message", (msg) ->
+      events.out_message? msg
+
+    webrtc.on "peerStreamAdded", (peer) ->
+      peer.stream.onended = ->
+        console.log "Stream ended"
+      peer.stream.onremovetrack = ->
+        console.log "Track ended"
+      $rootScope.$apply ->
+        events.on_remote_camera? peer
+
+    webrtc.on "peerStreamRemoved", (args...) ->
+      console.log "peerStreamRemoved", arguments
+
+    window.webrtc_a = events = 
+      started: false
+      users: []
+      waiting_msgs: []
+      users_to_call: []
+
+      on_my_camera: null
+      on_remote_camera: null
+      out_message: null
+      
+      init: (cam_resolution = "small") ->
+        webrtc.startLocalMedia {
+            video: 
+              mandatory: 
+                switch cam_resolution
+                  when "small"
+                    maxWidth: 320
+                    maxHeight: 240
+                  when "medium"
+                    maxWidth: 640
+                    maxHeight: 480
+            audio: true
+
+          }, (err, stream) ->
+            #myVideo = attachMediaStream stream
+            console.log "CAM INIT"
+            if err 
+              console.log err
+              return 
+
+            $rootScope.$apply ->
+              events.on_my_camera?.call events, stream #myVideo
+              events.ready()
+
+      in_message: (msg) ->
+        console.log "in_message, @started?", @started
+        unless @started
+          @waiting_msgs.push msg
+          return
+
+        peers = webrtc.getPeers msg.from
+        console.log "on message", msg.type, peers.length
+        unless peers.length
+          @add_peer msg.from
+          peers = webrtc.getPeers msg.from
+
+        ###
+        if msg.type is "offer"
+          peer = webrtc.createPeer 
+            id: msg.from
+          peer.handleMessage msg
+        else
+        ###
+        _(peers).each (peer) ->
+          peer.handleMessage msg
+
+      on: (args...) ->
+        webrtc.on args...
+      join: (user_id) ->            
+        if webrtc.localStream
+          @add_peer user_id
+        else
+          @users.push user_id
+      
+      ready: ->
+        console.log "READY"
+        @started = true
+
+        while user_id = @users.pop()
+          @add_peer user_id
+
+        while user_id = @users_to_call.pop()
+          console.log "Calling", user_id
+          @call_peer user_id
+
+        while msg = @waiting_msgs.shift()
+          @in_message msg
+
+      add_peer: (user_id) ->
+        unless  webrtc.getPeers(user_id)?.length
+          webrtc.createPeer
+            id: user_id
+
+      call_peer: (user_id) ->
+        console.log "Calling #{user_id}"
+        peers = webrtc.getPeers user_id
+        console.log "peers", peers
+        _(peers).each (peer) ->
+          console.log ">Calling #{user_id}"
+          peer.start()    
+      
+      stop: ->
+        @started = false
+        peers = webrtc.getPeers()
+        _(peers).each (peer) ->
+          peer.end()              
+
+      toggleCam: ->
+        video = webrtc.localStream.getVideoTracks()[0]
+        video.enabled = not video.enabled
+
+      toggleMic: ->
+        audio = webrtc.localStream.getAudioTracks()[0]
+        audio.enabled = not audio.enabled
+
+      start: (users) ->
+        if webrtc.localStream
+          @on_my_camera? webrtc.localStream
+          @users = @users.concat users
+          @users_to_call = @users_to_call.concat users
+          @ready()
+        else 
+          # TODO 
+          @start_cam()

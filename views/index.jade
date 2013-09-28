@@ -33,7 +33,7 @@ block content
             span  for 
             input(ng-model="message.price",placeholder="enter your price here")
             span  and it looks like 
-            img(ng-src="{{message.photo}}",width=120)
+            img(ng-if="message.photo",ng-src="{{message.photo}}",width=120)
             photo-input(file-input="file",on-change="readFile()",)
             input(type="submit", value="Send", class="modal__submit")
 
@@ -62,7 +62,7 @@ block content
               ng-animate=" 'slide' "
             )
             li(class="message {{order.direction}}")
-              img(ng-src="{{order.photo}}",width=120)
+              img(ng-if="order.photo",ng-src="{{order.photo}}",width=120)
               span.message__user
                 a(ng-href="{{order.author.link}}",target="_blank")
                   {{order.author.username}}
@@ -100,6 +100,7 @@ block content
             longitude="selected.longitude", 
             refresh="isMapVisible()", 
             mark-click="true")
+
       pane(title="About me")
 
         fieldset
@@ -135,7 +136,7 @@ block content
             br
             ul 
               li(class="message {{chat.order.direction}}")
-                img(ng-src="{{chat.order.photo}}",width=120)
+                img(ng-if="chat.order.photo",ng-src="{{chat.order.photo}}",width=120)
                 span.message__user
                   a(ng-href="{{chat.order.author.link}}",target="_blank")
                     {{caht.order.author.username}}
@@ -150,10 +151,17 @@ block content
                     i.ss-icon pin
                     {{chat.order.poi.name}}
                   span.timeago(timeago="chat.order.post_date")
+                a(ng-if="me.id != chat.order.author.id",href="#",ng-click="visio_call()") Visio
+                .cams(ng-repeat="user in users")
+                  camera(stream="user.stream",show="cam.activated",autoplay="true",audio="user.audio")
+                br
+                br
                 ul
                   li.chat(ng-repeat="chat in chat.order.chats")
                     | {{chat.author.username}} &gt; {{chat.text}}
+
             input(ng-model="text",type="text",enter-submit="sendTxt()")
+            button(ng-click="sendTxt()") Send
 
 
 

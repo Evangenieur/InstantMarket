@@ -108,10 +108,18 @@ b {
       display: none; } }*/
   .tab-bar .tab-bar__tab {
     float: left;
-    border-right: 1px solid #ebebeb; }
+    border-right: 1px solid #ebebeb; 
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+    /*
     @media screen and (max-width: 600px) {
       .tab-bar .tab-bar__tab {
-        width: 25%; } }
+        width: 25%; 
+      } 
+    
+    */
   .tab-bar .tab-bar__link {
     text-transform: uppercase;
     font-size: 12px;
@@ -121,9 +129,11 @@ b {
     text-align: center;
     line-height: 40px;
     text-decoration: none; }
+    /*
     @media screen and (min-width: 600px) {
       .tab-bar .tab-bar__link {
         padding: 0 3em; } }
+    */
     .tab-bar .tab-bar__link.is-active {
       background: #f5f5f5;
       color: black; }
