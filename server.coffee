@@ -148,7 +148,7 @@ require("zappajs") PORT, ->
     direction: "sell"
     content: "Je vend mon corp"
     price: "15€"
-    hashtags: ["sell", "product"]
+    hashtags: ["sell", "service"]
     post_date: new Date()
     poi: 
       name: "Chez oam"

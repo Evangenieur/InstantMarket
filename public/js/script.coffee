@@ -125,7 +125,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
   ).
   filter("matchCurrentChannels", ->
     (orders, current_channels) ->
-      console.log "Filtering", orders, current_channels, arguments
       if current_channels?.length
         _(orders).filter (msg) ->
           _(msg.hashtags).intersection(current_channels).length
@@ -230,7 +229,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     # Map Refresh
 
     $scope.isMapVisible = (change_state) ->
-      console.log "isMapVisible", $scope._isMapVisible, change_state
       if not $scope._isMapVisible and change_state
         $scope.refreshMarkers()      
       $scope._isMapVisible = change_state ? $scope._isMapVisible
@@ -313,9 +311,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     $scope.toggleChannel = (channel, event) ->
       console.log "toggleChannel", 
-      chan = $scope.Hashtags.get(channel)
-      console.log "chan for #{channel}", chan, chan.get?, chan.set?
-      chan.set "joined", not chan.get "joined"
+      chan = _($scope.channels).find (chan) -> chan.name is channel
+      chan.joined = !chan.joined 
       removed = false
       $scope.current_channels = _($scope.current_channels)
         .reject (chan) ->
@@ -501,7 +498,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     restrict: 'A'
     link: (scope, elem, attrs) ->
       updateTime = ->
-        console.log "updateTime", attrs, attrs.timeago
         if attrs.timeago
           time = scope.$eval(attrs.timeago)
           elem.text(jQuery.timeago(time))

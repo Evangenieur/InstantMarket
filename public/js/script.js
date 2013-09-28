@@ -152,7 +152,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   };
 }).filter("matchCurrentChannels", function() {
   return function(orders, current_channels) {
-    console.log("Filtering", orders, current_channels, arguments);
     if (current_channels != null ? current_channels.length : void 0) {
       return _(orders).filter(function(msg) {
         return _(msg.hashtags).intersection(current_channels).length;
@@ -264,7 +263,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   }, true);
   $scope.poiShow = false;
   $scope.isMapVisible = function(change_state) {
-    console.log("isMapVisible", $scope._isMapVisible, change_state);
     if (!$scope._isMapVisible && change_state) {
       $scope.refreshMarkers();
     }
@@ -359,9 +357,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   };
   $scope.toggleChannel = function(channel, event) {
     var chan, removed;
-    console.log("toggleChannel", chan = $scope.Hashtags.get(channel));
-    console.log("chan for " + channel, chan, chan.get != null, chan.set != null);
-    chan.set("joined", !chan.get("joined"));
+    console.log("toggleChannel", chan = _($scope.channels).find(function(chan) {
+      return chan.name === channel;
+    }));
+    chan.joined = !chan.joined;
     removed = false;
     $scope.current_channels = _($scope.current_channels).reject(function(chan) {
       return chan === channel && (removed = true);
@@ -607,7 +606,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       var updateTime;
       updateTime = function() {
         var time;
-        console.log("updateTime", attrs, attrs.timeago);
         if (attrs.timeago) {
           time = scope.$eval(attrs.timeago);
           elem.text(jQuery.timeago(time));
