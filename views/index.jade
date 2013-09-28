@@ -16,7 +16,7 @@ block content
                   i.ss-icon pin
                   {{chan.stats.pois}}
           ul.message-list-item(
-              ng-repeat="order in orders | matchCurrentChannels:current_channels | orderBy:'-post_date'",
+              ng-repeat="order in orders | matchCurrentChannels:current_channels | orderBy:'post_date':true",
               ng-animate=" 'slide' "
             )
             li(class="message {{order.direction}}")
@@ -54,8 +54,8 @@ block content
 
             div(style="position: absolute; right: 50px;")
               .btn-group
-                button.btn#service-btn(type="button",ng-click="order_set('type', 'service')") Service
-                button.btn(type="button",ng-click="order_set('type', 'product')") Product
+                button.btn(type="button",ng-click="order.set('type', 'service')") Service
+                button.btn(type="button",ng-click="order.set('type', 'product')") Product
               .btn-group
                 button.btn(type="button",ng-click="order.set('direction', 'buy')") Buy
                 button.btn(type="button",ng-click="order.set('direction', 'sell')") Sell

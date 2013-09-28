@@ -275,7 +275,14 @@ a.message__hash {
 .buy {
   border-left: 5px solid #F70;
 }
+.btn:hover, .btn:active {
+  background-color: #F70;
+}
 .btn {
+  background-color: #07F;
+  color: #fff;
+  font-size: 13px;
+  border: 1px solid black;
   height: 30px;
   width: 60px;
 }

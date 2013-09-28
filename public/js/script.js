@@ -365,15 +365,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       return $scope.usernamePrompt = true;
     }
     $scope.usernamePrompt = false;
-    console.log("Test", {
-      id: Math.round(Math.random() * 100000000),
-      author: {
-        username: $scope.me.username
-      },
-      content: $scope.message.content,
-      hashtags: extractHashtags($scope.message.content),
-      poi: $scope.poiMessage.name ? $scope.poiMessage : null
-    });
     id = Math.round(Math.random() * 100000000).toString();
     doc = $scope.MarketOrders.add({
       id: id,

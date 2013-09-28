@@ -17,7 +17,7 @@ require("zappajs") PORT, ->
 
   console.log util.inspect mymarket, colors: true
 
-  @set "views", __dirname + "/views/"
+  @app.set "views", __dirname + "/views/"
   @set "view engine": "jade"
   @use "static"
   @io.set "log level", 0
