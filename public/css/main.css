@@ -63,14 +63,15 @@ a {
   .header__logo img {
     display: inline-block;
     margin: 8px 0;
-    vertical-align: text-top; }
+    vertical-align: text-top;
+    height: 60px    }
 
 #city {
-  color: #06b497;
+  color: white;
   font-size: 26px;
   display: inline-block;
-  margin-top: 16px;
-  vertical-align: top;
+  margin-bottom: 10px;
+  vertical-align: bottom;
   margin-left: 10px; }
 
 #total_connected {
