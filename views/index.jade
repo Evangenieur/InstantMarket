@@ -23,7 +23,7 @@ block content
             button.btn(type="button",ng-click="order.set('type', 'product')") Product
 
             textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
-            input(ng-model="message.prices",placeholder="price here")
+            input(ng-model="message.price",placeholder="price here")
             //- span.post__poi(ng-show='poiMessage.name.length > 0')
             //-   i.ss-icon(ng-click="poiMessage.name = ''") delete
             //-   {{poiMessage.name}}
@@ -48,6 +48,7 @@ block content
                 span.chan__nb-pois(ng-if="chan.stats.pois > 0")
                   i.ss-icon pin
                   {{chan.stats.pois}}
+
           ul.message-list-item(
               ng-repeat="order in orders | matchCurrentChannels:current_channels | orderBy:'post_date':true",
               ng-animate=" 'slide' "
@@ -61,6 +62,8 @@ block content
                 {{order.direction}}
                 br
                 span(ng-bind-html-unsafe="order.content")
+                span  
+                  b {{order.price}}
                 a(href="#", class="message__hash",
                   ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
                     # {{ hash }}
@@ -71,8 +74,8 @@ block content
                 span.timeago(timeago="order.post_date")
 
         .bottom-bar
-          button.btn.buy Buy
-          button.btn.sell Sell
+          button.btn.buy(ng-click="clickBuy()") Buy
+          button.btn.sell(ng-click="clickSell()") Sell
           button.btn.add(ng-click="toggleAddOrder()") +
 
 

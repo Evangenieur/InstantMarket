@@ -219,6 +219,23 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   , 1500
   */
 
+  $scope.clickBuy = function() {
+    console.log("clickBuy", $scope.panelAddShow);
+    if ($scope.panelAddShow) {
+      $scope.order.direction = "buy";
+      return $scope.sendMessage();
+    } else {
+      return $scope.toggleChannel("buy");
+    }
+  };
+  $scope.clickSell = function() {
+    if ($scope.panelAddShow) {
+      $scope.order.direction = "sell";
+      return $scope.sendMessage();
+    } else {
+      return $scope.toggleChannel("sell");
+    }
+  };
   $scope.me = (_ref = JSON.parse(localStorageService.get("me"))) != null ? _ref : {
     username: "",
     avatar: "",
@@ -384,15 +401,17 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       type: $scope.order.type,
       direction: $scope.order.direction,
       content: $scope.message.content,
+      price: $scope.price,
       hashtags: extractHashtags($scope.message.content).concat([$scope.order.direction, $scope.order.type]),
       poi: $scope.poiMessage.name ? $scope.poiMessage : null,
       post_date: (new Date()).toString()
     });
     $scope.message.content = "";
-    return $scope.poiMessage = {
+    $scope.poiMessage = {
       name: "",
       coord: []
     };
+    return $scope.panelAddShow = false;
   };
   add_or_update_channel = function(room) {
     if (!update_channel_state(room.name, room)) {

@@ -46,6 +46,9 @@ a {
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
+b {
+  font-weight: bold;
+}
 .header {
   background: #242424;
   position: relative;

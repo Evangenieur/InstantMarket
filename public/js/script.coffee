@@ -187,6 +187,21 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     , 1500
     ###
 
+    $scope.clickBuy = ->
+      console.log "clickBuy", $scope.panelAddShow
+      if $scope.panelAddShow
+        $scope.order.direction = "buy"
+        $scope.sendMessage()
+      else
+        $scope.toggleChannel "buy"
+
+    $scope.clickSell = ->
+      if $scope.panelAddShow
+        $scope.order.direction = "sell"
+        $scope.sendMessage()
+      else
+        $scope.toggleChannel "sell"
+
     $scope.me = JSON.parse(localStorageService.get("me")) ?
       username: ""
       avatar: ""
@@ -337,6 +352,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         type: $scope.order.type
         direction: $scope.order.direction
         content: $scope.message.content
+        price: $scope.price
         hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
         poi: if $scope.poiMessage.name then $scope.poiMessage else null
         post_date: (new Date()).toString()
@@ -346,6 +362,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         name: ""
         coord: []
 
+      $scope.panelAddShow = false
 
     add_or_update_channel = (room) ->
       unless update_channel_state room.name, room

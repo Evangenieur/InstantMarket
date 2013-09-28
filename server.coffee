@@ -134,7 +134,7 @@ require("zappajs") PORT, ->
       users: 0
       pois: 0
   sharedDoc.Hashtags.add
-    id: "serice"
+    id: "service"
     name: "service"
     stats: 
       users: 0
@@ -147,6 +147,7 @@ require("zappajs") PORT, ->
     type: "service"
     direction: "sell"
     content: "Je vend mon corp"
+    price: "15€"
     hashtags: ["sell", "product"]
     post_date: new Date()
     poi: 
