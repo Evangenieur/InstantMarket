@@ -277,7 +277,7 @@ a.message__hash {
     color: #3b3b3b; }
 
 .sell {
-  border-left: 5px solid #339999;
+  border-left: 5px solid #07F;
 }
 .buy {
   border-left: 5px solid #F70;
@@ -290,7 +290,6 @@ a.message__hash {
   color: #fff;
   font-size: 13px;
   border: none;
-  border-right: 1px solid black;
   height: 30px;
   min-width: 75px;
 }
@@ -583,7 +582,10 @@ a.message__hash {
 
 .message-list-item {
   overflow: hidden;
-  max-height: 150px; }
+  max-height: 150px; 
+  margin-bottom: 10px;
+  margin-right: 20px;
+ }
 
 .slide-enter, .slide-leave {
   -webkit-transition: 0.4s cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
