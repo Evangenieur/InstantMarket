@@ -146,7 +146,7 @@ require("zappajs") PORT, ->
       username: "Sniper"
     type: "service"
     direction: "sell"
-    content: "Je vend mon corp"
+    content: "killing joyn with webrtc"
     price: "15€"
     hashtags: ["sell", "service"]
     post_date: new Date()
