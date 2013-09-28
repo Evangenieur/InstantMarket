@@ -11,21 +11,32 @@ block content
           
           .post__message
 
-
-            button.btn(type="button",ng-click="order.set('type', 'service')") Service
-            button.btn(type="button",ng-click="order.set('type', 'product')") Product
-
-            textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
-            input(ng-model="message.price",placeholder="price here")
-
+            span I want to 
+            input(id="buy",type="radio",ng-model="order.direction",value="buy")
+            label(for="buy") Buy
+            span  or 
+            input(id="sell",type="radio",ng-model="order.direction",value="sell")
+            label(for="sell") Sell
+            span  a
+            input(id="service",type="radio",ng-model="order.type",value="service")
+            label(for="service") Service 
+            span  or 
+            input(id="product",type="radio",ng-model="order.type",value="product")
+            label(for="product") Product 
+            span of 
+            input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here")
+            span  for 
+            input(ng-model="message.price",placeholder="enter your price here")
+            span  and it looks like 
             img(ng-src="{{message.photo}}",width=120)
             photo-input(file-input="file",on-change="readFile()",)
+            input(type="submit", value="Send", class="modal__submit")
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
-          h3(class="modal__title") Merci de rentrer ton pseudo
-          input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
+          h3(class="modal__title") Please enter your name
+          input#pseudoprompt(type="text", placeholder="Your name", ng-model="me.username", class="modal__input")
           br
-          input(type="submit", value="Valider", class="modal__submit")
+          input(type="submit", value="OK", class="modal__submit")
     
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
@@ -67,9 +78,7 @@ block content
                 span.timeago(timeago="order.post_date")
 
         .bottom-bar
-          button.btn.buy(ng-click="clickBuy()") Buy
-          button.btn.sell(ng-click="clickSell()") Sell
-          button.btn.add(ng-click="toggleAddOrder()") +
+          button.btn.add(ng-click="toggleAddOrder()") Send your bid
 
 
       pane(title="Map", ng-click="test()")
