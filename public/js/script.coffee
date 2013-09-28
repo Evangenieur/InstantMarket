@@ -163,11 +163,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     first_connection = true
 
+    $scope.panelAddShow = false
     $scope.channels = []
     $scope.current_channels = []
     $scope.messages = []
     $scope.message =
       content: ""
+      price: ""
 
     ###
     i = 1
@@ -286,6 +288,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         $("#local_search").focus()
 
     $scope.toggleChannel = (channel, event) ->
+      console.log "toggleChannel", 
+      chan = $scope.Hashtags.get(channel)
+      console.log "chan for #{channel}", chan, chan.get?, chan.set?
+      chan.set "joined", not chan.get "joined"
       removed = false
       $scope.current_channels = _($scope.current_channels)
         .reject (chan) ->
@@ -299,6 +305,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       console.log "toggleChannel", arguments, event
       event.preventDefault()
+
+    $scope.toggleAddOrder = ->
+      console.log $scope.panelAddShow
+      $scope.panelAddShow = not $scope.panelAddShow
+      console.log $scope.panelAddShow
 
     $scope.inputFocus = ->
       $scope.$apply ->
@@ -326,9 +337,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         type: $scope.order.type
         direction: $scope.order.direction
         content: $scope.message.content
-        hashtags: extractHashtags $scope.message.content
+        hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
         poi: if $scope.poiMessage.name then $scope.poiMessage else null
-        post_date: new Date()
+        post_date: (new Date()).toString()
 
       $scope.message.content = ""
       $scope.poiMessage =

@@ -106,7 +106,7 @@ a {
     border-right: 1px solid #ebebeb; }
     @media screen and (max-width: 600px) {
       .tab-bar .tab-bar__tab {
-        width: 50%; } }
+        width: 25%; } }
   .tab-bar .tab-bar__link {
     text-transform: uppercase;
     font-size: 12px;
@@ -282,20 +282,60 @@ a.message__hash {
   background-color: #07F;
   color: #fff;
   font-size: 13px;
-  border: 1px solid black;
-  height: 30px;
-  width: 60px;
+  border: none;
+  border-right: 1px solid black;
+  height: 40px;
+  width: 40%;
 }
-.post {
-  height: 8%;
+.btn.buy {
+  background-color: #F70;
+}
+.btn.add {
+  width: 20%;
+}
+.bottom-bar {
   max-height: 100px;
-  min-height: 50px;
+  min-height: 40px;
   position: fixed;
   bottom: 0px;
   background: white;
   box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
   width: 100%;
-  z-index: 1; }
+  z-index: 5; 
+}
+.panel-animate-enter, .panel-animate-leave { 
+    -webkit-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -moz-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -ms-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -o-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+} 
+ 
+.panel-animate-enter {
+    top: 100%;
+}
+.panel-animate-enter.animate-enter-active {
+    top: 0;
+}
+ 
+.panel-animate-leave {
+    top: 0;
+}
+.panel-animate-leave.animate-leave-active{
+    top: -100%;
+}
+
+#panel-add {
+  /*display: none;*/
+  background-color: #777;
+  position: fixed;  
+  bottom: 0px;
+  width: 100%;
+  height: 50%;
+  z-index: 1; 
+}
+.post {
+}
 
 .poi-search {
   z-index: 3;
@@ -355,21 +395,17 @@ a.message__hash {
     .post__message {
       width: 85%; } }
   .post__message textarea {
-    width: 100%;
+    width: 250px;
     font-family: "Open sans", sans-serif;
     font-size: 14px;
     border: none;
     padding: 5px 50px 5px 10px;
     margin: 0;
-    height: 100%; }
+   }
     .post__message textarea:focus {
       outline: none;
       box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2); }
   .post__message .svg-icon {
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    margin-top: -14px;
     cursor: pointer;
     opacity: .6; }
     .post__message .svg-icon:hover {
@@ -428,7 +464,6 @@ a.message__hash {
 .post__submit {
   float: right;
   width: 10%;
-  height: 100%;
   display: block;
   font-size: 18px;
   border: none;
@@ -531,9 +566,33 @@ a.message__hash {
   transition: 0.4s cubic-bezier(0.25, 0.25, 0.75, 0.75) all; }
 
 .slide-leave, .slide-enter.slide-enter-active {
-  max-height: 150px;
+  max-height: 100%;
   opacity: 1; }
 
 .slide-enter, .slide-leave.slide-leave-active {
   opacity: 0;
   max-height: 0px; }
+
+.animate-enter, 
+.animate-leave
+{ 
+    -webkit-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -moz-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -ms-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -o-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+} 
+ 
+.animate-leave {
+    top: 100%;
+}
+.animate-leave.animate-leave-active {
+    top: 42px;
+}
+ 
+.animate-enter {
+    top: 42px;
+}
+.animate-enter.animate-enter-active{
+    top: -100%;
+}

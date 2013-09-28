@@ -2,6 +2,39 @@ extends layout
 
 block content
   .app
+      #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
+        form.post(ng-submit="sendMessage()")
+          
+          .poi-search(ng-class="{'is-hidden': !poiShow}")
+            i.ss-icon search
+            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+            ul.poi-search__results
+              li(ng-repeat="result in poiResults")
+                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
+          
+          //- button.post__submit(type="submit")
+          //-   i.ss-icon send
+          //-   span Send
+          
+          .post__message
+
+
+            button.btn(type="button",ng-click="order.set('type', 'service')") Service
+            button.btn(type="button",ng-click="order.set('type', 'product')") Product
+
+            textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
+            input(ng-model="message.prices",placeholder="price here")
+            //- span.post__poi(ng-show='poiMessage.name.length > 0')
+            //-   i.ss-icon(ng-click="poiMessage.name = ''") delete
+            //-   {{poiMessage.name}}
+            //- img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
+
+
+        form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
+          h3(class="modal__title") Merci de rentrer ton pseudo
+          input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
+          br
+          input(type="submit", value="Valider", class="modal__submit")
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
         .chat
@@ -37,42 +70,13 @@ block content
                   {{order.poi.name}}
                 span.timeago(timeago="order.post_date")
 
-        form.post(ng-submit="sendMessage()")
-          
-          .poi-search(ng-class="{'is-hidden': !poiShow}")
-            i.ss-icon search
-            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
-            ul.poi-search__results
-              li(ng-repeat="result in poiResults")
-                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
-          
-          button.post__submit(type="submit")
-            i.ss-icon send
-            span Send
-          
-          .post__message
+        .bottom-bar
+          button.btn.buy Buy
+          button.btn.sell Sell
+          button.btn.add(ng-click="toggleAddOrder()") +
 
-            div(style="position: absolute; right: 50px;")
-              .btn-group
-                button.btn(type="button",ng-click="order.set('type', 'service')") Service
-                button.btn(type="button",ng-click="order.set('type', 'product')") Product
-              .btn-group
-                button.btn(type="button",ng-click="order.set('direction', 'buy')") Buy
-                button.btn(type="button",ng-click="order.set('direction', 'sell')") Sell
 
-            textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your message here", enter-submit="sendMessage()")
-
-            span.post__poi(ng-show='poiMessage.name.length > 0')
-              i.ss-icon(ng-click="poiMessage.name = ''") delete
-              {{poiMessage.name}}
-            img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
-
-        form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
-          h3(class="modal__title") Merci de rentrer ton pseudo
-          input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
-          br
-          input(type="submit", value="Valider", class="modal__submit")
-      pane(title="Maps", ng-click="test()")
+      pane(title="Map", ng-click="test()")
         .map
           google-map(
             center="center", 
@@ -83,6 +87,6 @@ block content
             longitude="selected.longitude", 
             refresh="isMapVisible()", 
             mark-click="true")
-      pane(title="My orders")
+      pane(title="Me")
 
 

@@ -74,16 +74,16 @@ require("zappajs") PORT, ->
     scripts: [
       "/js/conf.js"
       "/socket.io/socket.io.js"
-      "//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"
-      "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"
-      "https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
+      "/js/jquery.min.js"
+      "/js/underscore-min.js"
+      "/js/angular.min.js"
       "/js/ui-bootstrap-tpls-0.5.0.min.js"
 
       "https://maps.googleapis.com/maps/api/js?sensor=false"
       "/js/angular-google-maps.js"
 
       "/zappa/Zappa-simple.js"
-      "//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.1.0/jquery.timeago.min.js"
+      "/js/jquery.timeago.min.js"
       "/js/localStorageModule.js"
       "/js/fastclick.js"
       "/js/bundle.js"
@@ -116,17 +116,29 @@ require("zappajs") PORT, ->
     .pipe @res
 
   sharedDoc.Hashtags.add
-    id: "toto"
-    name: "toto"
+    id: "sell"
+    name: "sell"
     stats: 
-      users: 1
-      pois: 1
+      users: 0
+      pois: 0
   sharedDoc.Hashtags.add
-    id: "titi"
-    name: "titi"
+    id: "buy"
+    name: "buy"
     stats: 
-      users: 1
-      pois: 1
+      users: 0
+      pois: 0
+  sharedDoc.Hashtags.add
+    id: "product"
+    name: "product"
+    stats: 
+      users: 0
+      pois: 0
+  sharedDoc.Hashtags.add
+    id: "serice"
+    name: "service"
+    stats: 
+      users: 0
+      pois: 0
   sharedDoc.MarketOrders.add
     id: "test-1"
     author:
@@ -135,7 +147,7 @@ require("zappajs") PORT, ->
     type: "service"
     direction: "sell"
     content: "Je vend mon corp"
-    hashtags: ["toto", "titi"]
+    hashtags: ["sell", "product"]
     post_date: new Date()
     poi: 
       name: "Chez oam"

@@ -195,11 +195,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   var add_or_update_channel, colorMarker, extractHashtags, first_connection, update_channel_state, _ref;
   window.scope = $scope;
   first_connection = true;
+  $scope.panelAddShow = false;
   $scope.channels = [];
   $scope.current_channels = [];
   $scope.messages = [];
   $scope.message = {
-    content: ""
+    content: "",
+    price: ""
   };
   /*
   i = 1
@@ -326,7 +328,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     }
   };
   $scope.toggleChannel = function(channel, event) {
-    var removed;
+    var chan, removed;
+    console.log("toggleChannel", chan = $scope.Hashtags.get(channel));
+    console.log("chan for " + channel, chan, chan.get != null, chan.set != null);
+    chan.set("joined", !chan.get("joined"));
     removed = false;
     $scope.current_channels = _($scope.current_channels).reject(function(chan) {
       return chan === channel && (removed = true);
@@ -339,6 +344,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     }
     console.log("toggleChannel", arguments, event);
     return event.preventDefault();
+  };
+  $scope.toggleAddOrder = function() {
+    console.log($scope.panelAddShow);
+    $scope.panelAddShow = !$scope.panelAddShow;
+    return console.log($scope.panelAddShow);
   };
   $scope.inputFocus = function() {
     return $scope.$apply(function() {
@@ -374,9 +384,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       type: $scope.order.type,
       direction: $scope.order.direction,
       content: $scope.message.content,
-      hashtags: extractHashtags($scope.message.content),
+      hashtags: extractHashtags($scope.message.content).concat([$scope.order.direction, $scope.order.type]),
       poi: $scope.poiMessage.name ? $scope.poiMessage : null,
-      post_date: new Date()
+      post_date: (new Date()).toString()
     });
     $scope.message.content = "";
     return $scope.poiMessage = {
