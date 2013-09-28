@@ -39,7 +39,13 @@ block content
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
               input(type="submit", value="Submit", class="modal__submit")
-    
+
+        form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
+          h3(class="modal__title") Please enter your name
+          input#pseudoprompt(type="text", placeholder="Your name", ng-model="me.username", class="modal__input")
+          br
+          input(type="submit", value="OK", class="modal__submit")
+              
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
         .chat
@@ -107,6 +113,7 @@ block content
           span.post__poi(ng-show='poiMessage.name.length > 0')
             i.ss-icon(ng-click="poiMessage.name = ''") delete
             {{poiMessage.name}}
+          
           img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
           .poi-search(ng-class="{'is-hidden': !poiShow}")
             i.ss-icon search
@@ -114,6 +121,7 @@ block content
             ul.poi-search__results
               li(ng-repeat="result in poiResults")
                 span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
+          
           span  which is
           input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
           label(for="my_position") my personal or
