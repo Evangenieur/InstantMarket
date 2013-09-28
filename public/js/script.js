@@ -75,7 +75,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         if (panes.length === 0) {
           $scope.select(pane);
         }
-        return panes.push(pane);
+        if (!_(panes).find(function(p) {
+          return p.title === pane.title;
+        })) {
+          return panes.push(pane);
+        }
       };
       return this.selectPane = function(pane) {
         return $scope.select(pane);
@@ -91,13 +95,14 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     transclude: true,
     scope: {
       title: '@',
-      activate: '@'
+      display: '='
     },
     link: function(scope, element, attrs, tabsCtrl) {
       tabsCtrl.addPane(scope);
-      return scope.$watch('active', function() {
-        console.log("ACTIVE CHANGED", arguments, scope.activate);
-        if (scope.activate) {
+      return scope.$watch('display', function() {
+        console.log("ACTIVE CHANGED", arguments, scope.display);
+        if (scope.display) {
+          console.log("Selecting Pane");
           return tabsCtrl.selectPane(scope);
         }
       });
@@ -370,9 +375,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   };
   $scope.paneChanged = function(selectedPane) {
     if (selectedPane.title === "Map") {
-      return $scope.isMapVisible(true);
+      $scope.isMapVisible(true);
     } else {
-      return $scope.isMapVisible(false);
+      $scope.isMapVisible(false);
+    }
+    if (selectedPane.title !== "Chat" && $scope.chat.show === true) {
+      $scope.chat.show = false;
+      return $scope.chat.order = null;
     }
   };
   $scope.order = {
@@ -391,7 +400,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     show: false,
     order: null
   };
-  $scope.chat = function(order) {
+  $scope.set_chat = function(order) {
     console.log("chat order", order);
     $scope.notifs = _($scope.notifs).reject(function(n) {
       return n === order;
@@ -616,14 +625,15 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
           });
           return $scope[doc_name].on("row_update", function(row) {
             var author;
-            console.log("row_update");
+            console.log("row_update", arguments);
             author = row.get("author");
             if (author.id === $scope.me.id) {
-              console.log("on my object");
-              if (!_($scope.notifs).find(function(n) {
-                return n.content === row.get('content');
-              })) {
-                return $scope.notifs.push(row.state);
+              if (row.get("update_date") !== row.get("post_date")) {
+                if (!_($scope.notifs).find(function(n) {
+                  return n.content === row.get('content');
+                })) {
+                  return $scope.notifs.push(row.state);
+                }
               }
             }
           });
@@ -739,7 +749,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   console.log("ChatCtrl", window.scope2 = $scope);
   $scope.text = "";
   return $scope.sendTxt = function() {
-    var chats, doc;
+    var chats, doc, now;
+    if ($scope.text === "") {
+      return;
+    }
     doc = $scope.MarketOrders.get($scope.chat.order.id);
     console.log("sendTxt", doc);
     chats = doc.get("chats");
@@ -749,10 +762,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         username: $scope.me.username,
         id: $scope.me.id
       },
-      text: $scope.text
+      text: $scope.text,
+      post_date: now = (new Date()).toISOString()
     });
     doc.set("chats", chats);
-    doc.set("update_date", (new Date()).toISOString());
+    doc.set("update_date", now);
     return $scope.text = "";
   };
 });

@@ -4,7 +4,9 @@ block content
   .app
       ul.notifs
         li.notif(ng-repeat="notif in notifs")
-          a(ng-click="chat(notif)",href="#") Chat on Product {{notif.content}}
+          a(ng-click="set_chat(notif)",href="#") Chat on Product {{notif.content}}
+      .top-bar
+          button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
         form.post(ng-submit="sendMessage()")
           
@@ -14,21 +16,32 @@ block content
           
           .post__message
 
-
-            button.btn(type="button",ng-click="order.set('type', 'service')") Service
-            button.btn(type="button",ng-click="order.set('type', 'product')") Product
-
-            textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
-            input(ng-model="message.price",placeholder="price here")
-
+            span I want to 
+            input(id="buy",type="radio",ng-model="order.direction",value="buy")
+            label(for="buy") Buy
+            span  or 
+            input(id="sell",type="radio",ng-model="order.direction",value="sell")
+            label(for="sell") Sell
+            span  a
+            input(id="service",type="radio",ng-model="order.type",value="service")
+            label(for="service") Service 
+            span  or 
+            input(id="product",type="radio",ng-model="order.type",value="product")
+            label(for="product") Product 
+            span of 
+            input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here")
+            span  for 
+            input(ng-model="message.price",placeholder="enter your price here")
+            span  and it looks like 
             img(ng-src="{{message.photo}}",width=120)
             photo-input(file-input="file",on-change="readFile()",)
+            input(type="submit", value="Send", class="modal__submit")
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
-          h3(class="modal__title") Merci de rentrer ton pseudo
-          input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
+          h3(class="modal__title") Please enter your name
+          input#pseudoprompt(type="text", placeholder="Your name", ng-model="me.username", class="modal__input")
           br
-          input(type="submit", value="Valider", class="modal__submit")
+          input(type="submit", value="OK", class="modal__submit")
     
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
@@ -53,27 +66,27 @@ block content
               span.message__user
                 a(ng-href="{{order.author.link}}",target="_blank")
                   {{order.author.username}}
-              p.message__content
-                {{order.type}}
-                {{order.direction}}
-                br
-                span(ng-bind-html-unsafe="order.content")
-                span  
-                  b {{order.price}}
                 a(href="#", class="message__hash",
                   ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
                     # {{ hash }}
+              p.message__content
+                span  is 
+                {{order.direction}}
+                span ing
+                span  a 
+                {{order.type}}
+                span  of 
+                span(ng-bind-html-unsafe="order.content")
+                span  for
+                span  
+                  b {{order.price}}
                 .rich-content(ng-bind-html-unsafe="order.rich")
-                a(ng-click="chat(order)",href="#") Chat
+                a(ng-click="set_chat(order)",href="#") Chat
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
                   {{order.poi.name}}
                 span.timeago(timeago="order.post_date")
 
-        .bottom-bar
-          button.btn.buy(ng-click="clickBuy()") Buy
-          button.btn.sell(ng-click="clickSell()") Sell
-          button.btn.add(ng-click="toggleAddOrder()") +
 
 
       pane(title="Map")
@@ -87,14 +100,16 @@ block content
             longitude="selected.longitude", 
             refresh="isMapVisible()", 
             mark-click="true")
-      pane(title="Me")
+      pane(title="About me")
 
-        h1 Who
         fieldset
-          legend Username / Company name
-          input(name="username",ng-model="me.username",placeholder="username here")
-          br
-          legend Order Position
+          span My name or business name is 
+          input(name="username",ng-model="me.username",placeholder="Your name here")
+          span  and I am located 
+          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+          label(for="my_position") at my current position
+          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+          label(for="company_position") or at this business location:  
           input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
 
           span.post__poi(ng-show='poiMessage.name.length > 0')
@@ -103,45 +118,42 @@ block content
           img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
           .poi-search(ng-class="{'is-hidden': !poiShow}")
             i.ss-icon search
-            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+            input#local_search(type="text", class="poi-search__input", placeholder="Type in your location", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
             ul.poi-search__results
               li(ng-repeat="result in poiResults")
                 span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
         
 
-          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
-          label(for="my_position") My position
-          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
-          label(for="company_position") Business location
 
         h1 My Orders
-      pane(ng-if="chat.show", title="Chat", activate="{{ chat.show }}")
-        #chat(ng-controller="ChatCtrl")
-          | Chat
-          br
-          {{chat.order}}
-          br
-          ul 
-            li(class="message {{chat.order.direction}}")
-              img(ng-src="{{chat.order.photo}}",width=120)
-              span.message__user
-                a(ng-href="{{chat.order.author.link}}",target="_blank")
-                  {{caht.order.author.username}}
-              p.message__content
-                {{chat.order.type}}
-                {{chat.order.direction}}
-                br
-                span(ng-bind-html-unsafe="chat.order.content")
-                span  
-                  b {{chat.order.price}}
-                span.poi-attach(ng-if="chat.order.poi.name")
-                  i.ss-icon pin
-                  {{chat.order.poi.name}}
-                span.timeago(timeago="chat.order.post_date")
-              ul
-                li.chat(ng-repeat="chat in chat.order.chats")
-                  | {{chat.author.username}} &gt; {{chat.text}}
-          input(ng-model="text",type="text",enter-submit="sendTxt()")
+      pane(title="Chat", display="chat.show")
+        div(ng-if="chat.order")
+          #chat(ng-controller="ChatCtrl")
+            | Chat
+            br
+            {{chat.order}}
+            br
+            ul 
+              li(class="message {{chat.order.direction}}")
+                img(ng-src="{{chat.order.photo}}",width=120)
+                span.message__user
+                  a(ng-href="{{chat.order.author.link}}",target="_blank")
+                    {{caht.order.author.username}}
+                p.message__content
+                  {{chat.order.type}}
+                  {{chat.order.direction}}
+                  br
+                  span(ng-bind-html-unsafe="chat.order.content")
+                  span  
+                    b {{chat.order.price}}
+                  span.poi-attach(ng-if="chat.order.poi.name")
+                    i.ss-icon pin
+                    {{chat.order.poi.name}}
+                  span.timeago(timeago="chat.order.post_date")
+                ul
+                  li.chat(ng-repeat="chat in chat.order.chats")
+                    | {{chat.author.username}} &gt; {{chat.text}}
+            input(ng-model="text",type="text",enter-submit="sendTxt()")
 
 
 

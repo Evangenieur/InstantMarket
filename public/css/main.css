@@ -67,7 +67,7 @@ b {
     display: inline-block;
     margin: 8px 0;
     vertical-align: text-top;
-    height: 60px    }
+    height: 30px    }
 
 #city {
   color: white;
@@ -286,7 +286,7 @@ a.message__hash {
   font-size: 13px;
   border: none;
   border-right: 1px solid black;
-  height: 40px;
+  height: 30px;
   width: 40%;
 }
 .btn.buy {
@@ -294,15 +294,18 @@ a.message__hash {
 }
 .btn.add {
   width: 20%;
+  font-weight:bold;
+  float: right;
 }
-.bottom-bar {
+.top-bar {
   max-height: 100px;
   min-height: 40px;
   position: fixed;
-  bottom: 0px;
-  background: white;
+  top: 10px;
+  right: 20px;
   box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  width: 50%;
+  height:100%;
   z-index: 5; 
 }
 .panel-animate-enter, .panel-animate-leave { 

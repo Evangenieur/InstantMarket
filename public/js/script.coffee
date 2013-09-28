@@ -61,7 +61,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       @addPane = (pane) ->
         $scope.select(pane) if panes.length is 0
-        panes.push(pane)
+        unless _(panes).find((p) -> p.title is pane.title)
+          panes.push(pane)
       
       @selectPane = (pane) ->
         $scope.select(pane)
@@ -84,12 +85,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     transclude: true
     scope: 
       title: '@'
-      activate: '@'
+      display: '='
     link: (scope, element, attrs, tabsCtrl) ->
       tabsCtrl.addPane(scope)
-      scope.$watch 'active', ->
-        console.log "ACTIVE CHANGED", arguments, scope.activate
-        if scope.activate 
+      scope.$watch 'display', ->
+        console.log "ACTIVE CHANGED", arguments,  scope.display
+        if scope.display
+          console.log "Selecting Pane"
           tabsCtrl.selectPane(scope)
     template: '''
       <div class="tab-pane" ng-class="{'is-active': selected}" ng-transclude>
@@ -329,6 +331,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       else
         $scope.isMapVisible false
 
+      if selectedPane.title isnt "Chat" and $scope.chat.show is true
+        $scope.chat.show = false
+        $scope.chat.order = null
 
     $scope.order = 
       set: (prop, value) ->
@@ -343,7 +348,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       show: false
       order: null
 
-    $scope.chat = (order) ->
+    $scope.set_chat = (order) ->
       console.log "chat order", order
       $scope.notifs = _($scope.notifs).reject (n) -> n is order
       $scope.chat.show = true
@@ -502,12 +507,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
               $scope.orders = (row.state for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
             $scope[doc_name].on "row_update", (row) ->
-              console.log "row_update"
+              console.log "row_update", arguments
               author = row.get("author")
               if author.id is $scope.me.id
-                console.log "on my object"
-                unless _($scope.notifs).find((n) -> n.content is row.get 'content')
-                  $scope.notifs.push row.state
+                if row.get("update_date") isnt row.get("post_date")
+                  unless _($scope.notifs).find((n) -> n.content is row.get 'content')
+                    $scope.notifs.push row.state
 
 
 
@@ -614,6 +619,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     console.log "ChatCtrl", window.scope2 = $scope
     $scope.text = ""
     $scope.sendTxt = ->
+      return if $scope.text is ""
       doc = $scope.MarketOrders.get($scope.chat.order.id)
       console.log "sendTxt", doc
       chats = doc.get "chats"
@@ -623,8 +629,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           username: $scope.me.username
           id: $scope.me.id
         text: $scope.text
+        post_date: now = (new Date()).toISOString()
       doc.set "chats", chats
-      doc.set "update_date", (new Date()).toISOString()
+      doc.set "update_date", now
       $scope.text = ""
   )
 
