@@ -133,31 +133,26 @@ block content
       pane(title="Chat", display="chat.show")
         div(ng-if="chat.order")
           #chat(ng-controller="ChatCtrl")
-            | Chat
-            br
-            {{chat.order}}
             br
             ul 
               li(class="message {{chat.order.direction}}")
-                img(ng-src="{{chat.order.photo}}",width=120)
                 span.message__user
-                  a(ng-href="{{chat.order.author.link}}",target="_blank")
-                    {{caht.order.author.username}}
                 p.message__content
-                  {{chat.order.type}}
-                  {{chat.order.direction}}
-                  br
+                  | Chat with 
+                  a(ng-href="{{chat.order.author.link}}",target="_blank")
+                    {{chat.order.author.username}}
+                  |  {{chat.order.direction}}ing 
+                  {{chat.order.type}} 
                   span(ng-bind-html-unsafe="chat.order.content")
-                  span  
+                  span  for  
                     b {{chat.order.price}}
                   span.poi-attach(ng-if="chat.order.poi.name")
                     i.ss-icon pin
                     {{chat.order.poi.name}}
-                  span.timeago(timeago="chat.order.post_date")
                 ul
                   li.chat(ng-repeat="chat in chat.order.chats")
                     | {{chat.author.username}} &gt; {{chat.text}}
-            input(ng-model="text",type="text",enter-submit="sendTxt()")
+                input(ng-model="text",type="text",enter-submit="sendTxt()")
 
 
 
