@@ -102,9 +102,10 @@ b {
     content: "";
     display: table;
     clear: both; }
+  /*
   @media screen and (min-width: 1000px) {
     .tab-bar {
-      display: none; } }
+      display: none; } }*/
   .tab-bar .tab-bar__tab {
     float: left;
     border-right: 1px solid #ebebeb; }
@@ -129,12 +130,11 @@ b {
 
 .tab-pane {
   display: none; }
-  @media screen and (min-width: 1000px) {
+  /*@media screen and (min-width: 1000px) {
     .tab-pane {
-      display: block; } }
+      display: block; } }*/
   .tab-pane.is-active {
     display: block; }
-
 #nav-toggle {
   position: absolute;
   line-height: 40px;
@@ -151,14 +151,12 @@ b {
 
   #nav-toggle {
     display: none; } }
+/*
 .tab-pane-pattern, .chat {
   width: 90%;
   height: 90%;
   margin: 20px auto 0px auto; }
-
-.chat {
-  padding-bottom: 200px; }
-
+*/
 .tab-pane__title {
   font-size: 24px;
   font-weight: 600;
@@ -498,7 +496,7 @@ a.message__hash {
   height: 90%;
   width: 100%; }
 
-@media screen and (min-width: 1000px) {
+/*@media screen and (min-width: 1000px) {
   .chat {
     width: 50%;
     padding: 0 20px;
@@ -511,7 +509,7 @@ a.message__hash {
     width: 50%;
     float: left;
     position: sticky; } }
-
+*/
 .modal {
   width: 98%;
   max-width: 400px;
@@ -599,4 +597,13 @@ a.message__hash {
 }
 .animate-enter.animate-enter-active{
     top: -100%;
+}
+.chat {
+  padding-left: 10px;
+}
+.notifs {
+  background-color: #f77;
+}
+.notif {
+  padding: 5px;  
 }

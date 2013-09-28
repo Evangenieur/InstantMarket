@@ -119,7 +119,7 @@ require("zappajs") PORT, ->
     id: "sell"
     name: "sell"
     stats: 
-      users: 0
+      users: 1
       pois: 0
   sharedDoc.Hashtags.add
     id: "buy"
@@ -137,11 +137,12 @@ require("zappajs") PORT, ->
     id: "service"
     name: "service"
     stats: 
-      users: 0
+      users: 1
       pois: 0
   sharedDoc.MarketOrders.add
     id: "test-1"
     author:
+      id: "test"
       link: "link"
       username: "Sniper"
     type: "service"
@@ -153,6 +154,9 @@ require("zappajs") PORT, ->
     poi: 
       name: "Chez oam"
       coord: [48.85445704683003, 2.4362782219366443]
+    chats: [
+     
+    ]
 
   ### RT COMM ###
   @on connection: ->

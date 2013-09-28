@@ -62,6 +62,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       @addPane = (pane) ->
         $scope.select(pane) if panes.length is 0
         panes.push(pane)
+      
+      @selectPane = (pane) ->
+        $scope.select(pane)
+
     template:'''
       <div class="tabs">
         <ul class="tab-bar">
@@ -78,9 +82,15 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     require: '^tabs'
     restrict: 'E'
     transclude: true
-    scope: { title: '@' }
+    scope: 
+      title: '@'
+      activate: '@'
     link: (scope, element, attrs, tabsCtrl) ->
       tabsCtrl.addPane(scope)
+      scope.$watch 'active', ->
+        console.log "ACTIVE CHANGED", arguments, scope.activate
+        if scope.activate 
+          tabsCtrl.selectPane(scope)
     template: '''
       <div class="tab-pane" ng-class="{'is-active': selected}" ng-transclude>
       </div>
@@ -98,7 +108,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
   directive('photoInput', ($parse) ->
     console.log "in photoinput"
     restrict: 'EA'
-    template: "<input type='image' accept='image/*' capture='camera' />"
+    template: "<input type='file' accept='image/*' capture='camera' />"
     replace: true
     link: ($scope, element, attrs) ->
       console.log "link in photoinput"
@@ -224,6 +234,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     $scope.message =
       content: ""
       price: ""
+    $scope.notifs = []
 
     ###
     i = 1
@@ -290,6 +301,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     $scope.isMapVisible false
 
     ### Media queries ###
+    ###
     $timeout ->
       $scope.$apply ->
         mq = window.matchMedia("(min-width: 1000px)")
@@ -298,6 +310,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           console.log "MQ Wide Matching"
           $scope.isMapVisible true
     , 1000
+    ###
 
     colorMarker = (chan) ->
       console.log "colorMarker", $scope.channels
@@ -326,6 +339,16 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     $scope.poiMessage =
       name: ""
       coord: []
+    $scope.chat = 
+      show: false
+      order: null
+
+    $scope.chat = (order) ->
+      console.log "chat order", order
+      $scope.notifs = _($scope.notifs).reject (n) -> n is order
+      $scope.chat.show = true
+      $scope.chat.order = order
+
 
     $scope.refreshMarkers = ->
       $scope.markers = []
@@ -410,23 +433,33 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         return $scope.usernamePrompt = true
       $scope.usernamePrompt = false
 
+      hashtags = extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
+      for hashtag in hashtags
+        doc = $scope.Hashtags.get(hashtag)
+        stats = doc.get "stats"
+        stats.users++
+        doc.set "stats", stats
 
       doc = $scope.MarketOrders.add
         id: cuid()
-        author: username: $scope.me.username
+        author: 
+          id: $scope.me.id
+          username: $scope.me.username
         type: $scope.order.type
         direction: $scope.order.direction
         content: $scope.message.content
         photo: $scope.message.photo
-        price: $scope.price
-        hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
+        price: $scope.message.price
+        hashtags: hashtags
         poi: 
           name: $scope.me.order.place_name
           coord: if $scope.me.order.position_type is "mine"
               $scope.me.coord
             else
               $scope.me.order.coord
-        post_date: (new Date()).toISOString()
+        post_date: now = (new Date()).toISOString()
+        update_date: now
+        chats: []
 
       $scope.message.content = ""
       $scope.poiMessage =
@@ -435,6 +468,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         photo: null
 
       $scope.panelAddShow = false
+      $scope.chatShow = false
 
     add_or_update_channel = (room) ->
       unless update_channel_state room.name, room
@@ -462,11 +496,20 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
               $scope.channels = (_(row.state).clone() for id, row of $scope[doc_name].rows)
           when "MarketOrders"
             $scope[doc_name].on "add", ->
-              $scope.orders = (_(row.state).clone() for id, row of $scope[doc_name].rows)
+              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
             $scope[doc_name].on "remove", ->
-              $scope.orders = (_(row.state).clone() for id, row of $scope[doc_name].rows)
+              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
+            $scope[doc_name].on "row_update", (row) ->
+              console.log "row_update"
+              author = row.get("author")
+              if author.id is $scope.me.id
+                console.log "on my object"
+                unless _($scope.notifs).find((n) -> n.content is row.get 'content')
+                  $scope.notifs.push row.state
+
+
 
 
 
@@ -549,6 +592,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
           keyup: () ->
             if submit
+              console.log attrs.enterSubmit, scope
               scope.$eval( attrs.enterSubmit )
 
               # flush model changes manually
@@ -565,5 +609,22 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           elem.text(jQuery.timeago(time))
           $timeout(updateTime, 15000)
       scope.$watch(attrs.timeago, updateTime);
+  ).
+  controller('ChatCtrl', ($scope, $filter, socket) ->
+    console.log "ChatCtrl", window.scope2 = $scope
+    $scope.text = ""
+    $scope.sendTxt = ->
+      doc = $scope.MarketOrders.get($scope.chat.order.id)
+      console.log "sendTxt", doc
+      chats = doc.get "chats"
+      console.log "chats", chats
+      chats.push 
+        author:
+          username: $scope.me.username
+          id: $scope.me.id
+        text: $scope.text
+      doc.set "chats", chats
+      doc.set "update_date", (new Date()).toISOString()
+      $scope.text = ""
   )
 

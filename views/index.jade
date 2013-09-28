@@ -2,6 +2,9 @@ extends layout
 
 block content
   .app
+      ul.notifs
+        li.notif(ng-repeat="notif in notifs")
+          a(ng-click="chat(notif)",href="#") Chat on Product {{notif.content}}
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
         form.post(ng-submit="sendMessage()")
           
@@ -61,6 +64,7 @@ block content
                   ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
                     # {{ hash }}
                 .rich-content(ng-bind-html-unsafe="order.rich")
+                a(ng-click="chat(order)",href="#") Chat
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
                   {{order.poi.name}}
@@ -72,7 +76,7 @@ block content
           button.btn.add(ng-click="toggleAddOrder()") +
 
 
-      pane(title="Map", ng-click="test()")
+      pane(title="Map")
         .map
           google-map(
             center="center", 
@@ -111,6 +115,33 @@ block content
           label(for="company_position") Business location
 
         h1 My Orders
+      pane(ng-if="chat.show", title="Chat", activate="{{ chat.show }}")
+        #chat(ng-controller="ChatCtrl")
+          | Chat
+          br
+          {{chat.order}}
+          br
+          ul 
+            li(class="message {{chat.order.direction}}")
+              img(ng-src="{{chat.order.photo}}",width=120)
+              span.message__user
+                a(ng-href="{{chat.order.author.link}}",target="_blank")
+                  {{caht.order.author.username}}
+              p.message__content
+                {{chat.order.type}}
+                {{chat.order.direction}}
+                br
+                span(ng-bind-html-unsafe="chat.order.content")
+                span  
+                  b {{chat.order.price}}
+                span.poi-attach(ng-if="chat.order.poi.name")
+                  i.ss-icon pin
+                  {{chat.order.poi.name}}
+                span.timeago(timeago="chat.order.post_date")
+              ul
+                li.chat(ng-repeat="chat in chat.order.chats")
+                  | {{chat.author.username}} &gt; {{chat.text}}
+          input(ng-model="text",type="text",enter-submit="sendTxt()")
 
 
 
