@@ -98,7 +98,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
   directive('photoInput', ($parse) ->
     console.log "in photoinput"
     restrict: 'EA'
-    template: "<input type='file' accept='image/*;capture=camera' />"
+    template: "<input type='image' accept='image/*' capture='camera' />"
     replace: true
     link: ($scope, element, attrs) ->
       console.log "link in photoinput"
