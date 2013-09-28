@@ -2,6 +2,8 @@ extends layout
 
 block content
   .app
+      .top-bar
+          button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
         form.post(ng-submit="sendMessage()")
           
@@ -81,8 +83,6 @@ block content
                   {{order.poi.name}}
                 span.timeago(timeago="order.post_date")
 
-        .top-bar
-          button.btn.add(ng-click="toggleAddOrder()") Submit a bid
 
 
       pane(title="Map", ng-click="test()")

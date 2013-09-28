@@ -142,7 +142,6 @@ require("zappajs") PORT, ->
   sharedDoc.MarketOrders.add
     id: "test-1"
     author:
-      link: "link"
       username: "Sniper"
     type: "service"
     direction: "sell"
