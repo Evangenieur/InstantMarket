@@ -216,7 +216,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     ### Media queries ###
     $timeout ->
       $scope.$apply ->
-        mq = window.matchMedia("(min-width: 1280px)")
+        mq = window.matchMedia("(min-width: 1000px)")
         if (mq.matches)
           console.log "MQ Wide Matching"
           $scope.isMapVisible true

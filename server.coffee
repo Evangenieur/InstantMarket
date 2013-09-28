@@ -17,6 +17,7 @@ require("zappajs") PORT, ->
 
   console.log util.inspect mymarket, colors: true
 
+  @set "views", __dirname + "/views/"
   @set "view engine": "jade"
   @use "static"
   @io.set "log level", 0
@@ -93,7 +94,7 @@ require("zappajs") PORT, ->
 
   ### ROUTES ###
   @get "/": ->
-    @render "index", view_extend
+    @render index: view_extend
 
   @get "/js/conf.js": ->
     @send """

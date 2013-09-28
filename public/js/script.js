@@ -247,7 +247,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   $timeout(function() {
     return $scope.$apply(function() {
       var mq;
-      mq = window.matchMedia("(min-width: 1280px)");
+      mq = window.matchMedia("(min-width: 1000px)");
       if (mq.matches) {
         console.log("MQ Wide Matching");
         return $scope.isMapVisible(true);

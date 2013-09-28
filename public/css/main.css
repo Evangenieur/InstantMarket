@@ -98,7 +98,7 @@ a {
     content: "";
     display: table;
     clear: both; }
-  @media screen and (min-width: 1280px) {
+  @media screen and (min-width: 1000px) {
     .tab-bar {
       display: none; } }
   .tab-bar .tab-bar__tab {
@@ -125,7 +125,7 @@ a {
 
 .tab-pane {
   display: none; }
-  @media screen and (min-width: 1280px) {
+  @media screen and (min-width: 1000px) {
     .tab-pane {
       display: block; } }
   .tab-pane.is-active {
@@ -452,7 +452,7 @@ a.message__hash {
   height: 90%;
   width: 100%; }
 
-@media screen and (min-width: 1280px) {
+@media screen and (min-width: 1000px) {
   .chat {
     width: 50%;
     padding: 0 20px;
@@ -460,7 +460,7 @@ a.message__hash {
     overflow: scroll;
     padding-bottom: 120px; } }
 
-@media screen and (min-width: 1280px) {
+@media screen and (min-width: 1000px) {
   .map {
     width: 50%;
     float: left;
