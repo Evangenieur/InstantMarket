@@ -25,7 +25,7 @@ require("zappajs") PORT, ->
   @server.on "listening", =>
     console.log "InstantMarket listening on port #{PORT.toString().yellow}".green
 
-  @get "/js/bundle.js": browserify ["crdt", "duplex"]
+  @get "/js/bundle.js": browserify ["crdt", "duplex", "cuid"]
 
   @shared "/js/shared.js": ->
  

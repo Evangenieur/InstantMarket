@@ -5,13 +5,6 @@ block content
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
         form.post(ng-submit="sendMessage()")
           
-          .poi-search(ng-class="{'is-hidden': !poiShow}")
-            i.ss-icon search
-            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
-            ul.poi-search__results
-              li(ng-repeat="result in poiResults")
-                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
-          
           //- button.post__submit(type="submit")
           //-   i.ss-icon send
           //-   span Send
@@ -24,10 +17,6 @@ block content
 
             textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
             input(ng-model="message.price",placeholder="price here")
-            //- span.post__poi(ng-show='poiMessage.name.length > 0')
-            //-   i.ss-icon(ng-click="poiMessage.name = ''") delete
-            //-   {{poiMessage.name}}
-            //- img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
 
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
@@ -91,5 +80,33 @@ block content
             refresh="isMapVisible()", 
             mark-click="true")
       pane(title="Me")
+
+        h1 Who
+        fieldset
+          legend Username / Company name
+          input(name="username",ng-model="me.username",placeholder="username here")
+          br
+          legend Order Position
+          input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
+
+          span.post__poi(ng-show='poiMessage.name.length > 0')
+            i.ss-icon(ng-click="poiMessage.name = ''") delete
+            {{poiMessage.name}}
+          img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
+          .poi-search(ng-class="{'is-hidden': !poiShow}")
+            i.ss-icon search
+            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+            ul.poi-search__results
+              li(ng-repeat="result in poiResults")
+                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
+        
+
+          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+          label(for="my_position") My position
+          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+          label(for="company_position") Business location
+
+        h1 My Orders
+
 
 

@@ -12,7 +12,8 @@
     "underscore": "~1.5.2",
     "crdt": "~3.5.4",
     "jade": "~0.35.0",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "cuid": "~1.2.1"
   },
   "devDependencies": {},
   "scripts": {

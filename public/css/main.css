@@ -346,7 +346,7 @@ a.message__hash {
   position: absolute;
   height: 140px;
   width: 300px;
-  top: -145px;
+  /*top: -145px;*/
   background: #FFF;
   right: 20px;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
@@ -357,13 +357,13 @@ a.message__hash {
   @media screen and (max-width: 500px) {
     .poi-search {
       width: 100%;
-      top: -125px;
+      /*top: -125px;*/
       height: 120px;
       right: 0px; }
       .poi-search:before, .poi-search:after {
         display: none; } }
   .poi-search.is-hidden {
-    top: 0px;
+    /*top: 0px;*/
     opacity: 0;
     pointer-events: none; }
   .poi-search i.ss-icon {
@@ -378,7 +378,7 @@ a.message__hash {
   font-size: 13px;
   color: #FFF;
   height: 40px;
-  background: #2ecc71;
+  background: #999;
   width: 100%; }
   .poi-search__input:focus {
     outline: none;

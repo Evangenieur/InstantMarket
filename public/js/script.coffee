@@ -1,3 +1,4 @@
+cuid = require "cuid"
 ### Fastclick for responsive mobile click ###
 window.addEventListener "load", (->
   FastClick.attach document.body
@@ -203,9 +204,14 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         $scope.toggleChannel "sell"
 
     $scope.me = JSON.parse(localStorageService.get("me")) ?
+      id: cuid()
       username: ""
       avatar: ""
       userAgent: navigator.userAgent
+      order: 
+        place_name: ""
+        position_type: "mine"
+        coord: []
 
     $scope.$watch "me", (n,o) ->
       unless _(n).isEqual o
@@ -224,6 +230,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     # Map Refresh
 
     $scope.isMapVisible = (change_state) ->
+      console.log "isMapVisible", $scope._isMapVisible, change_state
       if not $scope._isMapVisible and change_state
         $scope.refreshMarkers()      
       $scope._isMapVisible = change_state ? $scope._isMapVisible
@@ -234,6 +241,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     $timeout ->
       $scope.$apply ->
         mq = window.matchMedia("(min-width: 1000px)")
+        console.log "mq", mq
         if (mq.matches)
           console.log "MQ Wide Matching"
           $scope.isMapVisible true
@@ -251,7 +259,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     $scope.paneChanged = (selectedPane) ->
 
-      if selectedPane.title is "Maps"
+      if selectedPane.title is "Map"
         $scope.isMapVisible true
       else
         $scope.isMapVisible false
@@ -272,7 +280,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       _($filter('matchCurrentChannels') $scope.orders, $scope.current_channels)
       .each (order) ->
-        if order.poi
+        if order.poi and order.poi.coord?.length
           $scope.markers.push(
             latitude: order.poi.coord[0]
             longitude: order.poi.coord[1]
@@ -292,9 +300,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     $scope.addPoi = (name, lat, lng)->
       console.log "addPoi", lat, lng
-      $scope.poiMessage.name = name
-      $scope.poiMessage.coord = [lat, lng]
+      $scope.me.order.place_name = name
+      $scope.me.order.coord = [lat, lng]
       $("#local_search").val("")
+      $scope.me.order.position_type = "company"
       $scope.togglePoiShow()
 
     $scope.togglePoiShow = ->
@@ -344,18 +353,22 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         return $scope.usernamePrompt = true
       $scope.usernamePrompt = false
 
-      id = Math.round(Math.random() * 100000000).toString()
 
       doc = $scope.MarketOrders.add
-        id: id
+        id: cuid()
         author: username: $scope.me.username
         type: $scope.order.type
         direction: $scope.order.direction
         content: $scope.message.content
         price: $scope.price
         hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
-        poi: if $scope.poiMessage.name then $scope.poiMessage else null
-        post_date: (new Date()).toString()
+        poi: 
+          name: $scope.me.order.place_name
+          coord: if $scope.me.order.position_type is "mine"
+              $scope.me.coord
+            else
+              $scope.me.order.coord
+        post_date: (new Date()).toISOString()
 
       $scope.message.content = ""
       $scope.poiMessage =
@@ -385,15 +398,15 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         switch doc_name
           when "Hashtags"
             $scope[doc_name].on "add", ->
-              $scope.channels = (row.state for id, row of $scope[doc_name].rows)
+              $scope.channels = (_(row.state).clone() for id, row of $scope[doc_name].rows)
             $scope[doc_name].on "remove", ->
-              $scope.channels = (row.state for id, row of $scope[doc_name].rows)
+              $scope.channels = (_(row.state).clone() for id, row of $scope[doc_name].rows)
           when "MarketOrders"
             $scope[doc_name].on "add", ->
-              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
+              $scope.orders = (_(row.state).clone() for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
             $scope[doc_name].on "remove", ->
-              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
+              $scope.orders = (_(row.state).clone() for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
 
 
@@ -430,7 +443,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       add_or_update_channel room
 
     # Google Maps
-    $scope.zoom = 13
+    $scope.zoom = 12
     $scope.center = 
       latitude: mymarket.geo.location.latitude
       longitude: mymarket.geo.location.longitude
