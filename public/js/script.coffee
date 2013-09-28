@@ -95,6 +95,25 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         element.bind 'focus', ->
           scope.$eval(attrs.onFocus)
   ).
+  directive('photoInput', ($parse) ->
+    console.log "in photoinput"
+    restrict: 'EA'
+    template: "<input type='file' accept='image/*;capture=camera' />"
+    replace: true
+    link: ($scope, element, attrs) ->
+      console.log "link in photoinput"
+      modelGet = $parse(attrs.fileInput)
+      modelSet = modelGet.assign
+      onChange = $parse(attrs.onChange)
+ 
+      updateModel = ->
+        scope.$apply ->
+          modelSet(scope, element[0].files[0])
+          onChange(scope)
+      
+      element.bind('change', updateModel)
+
+  ).
   factory("hashchange", ($rootScope) ->
     last_hash = window.location.hash
     on: (cb) ->
@@ -158,7 +177,42 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         #socket.removeListener "disconnect", off_cnx
 
       doc  
-    ).controller('AppCtrl', ($scope, $filter, $http, socket, hashchange, $timeout, localStorageService, sharedDoc) ->
+  ).
+  factory('fileReader', ($q, $log) ->
+    onLoad = (reader, deferred, scope) ->
+      ->
+        scope.$apply ->
+          deferred.resolve reader.result
+
+    onError = (reader, deferred, scope) ->
+      ->
+        scope.$apply ->
+          deferred.reject  reader.result
+
+    onProgress = (reader, scope) ->
+      (event) ->
+        scope.$broadcast "fileProgress",
+          total: event.total,
+          loaded: event.loaded
+
+    getReader = (deferred, scope) ->
+        reader = new FileReader();
+        reader.onload = onLoad(reader, deferred, scope)
+        reader.onerror = onError(reader, deferred, scope)
+        reader.onprogress = onProgress(reader, scope)
+        reader
+
+    readAsDataURL = (file, scope) ->
+        deferred = $q.defer()
+         
+        reader = getReader(deferred, scope)
+        reader.readAsDataURL(file)
+         
+        deferred.promise
+
+    readAsDataUrl: readAsDataURL  
+  ).
+  controller('AppCtrl', ($scope, $filter, $http, socket, hashchange, $timeout, localStorageService, sharedDoc, fileReader) ->
     window.scope = $scope
 
     first_connection = true
@@ -341,6 +395,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     extractHashtags = (text) ->
       _(text.match(/#([\w-_]+)/g)).map (ht) -> ht.slice(1)
 
+    $scope.readFile = ->
+
+      console.log "fileReader", $scope, @
+      fileReader.readAsDataUrl($scope.file, $scope).then (result) ->
+        $scope.message.photo = result
+
     $scope.sendMessage = ->
       console.log "Sending.Message", $scope.message.content
       return unless $scope.message.content
@@ -357,6 +417,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         type: $scope.order.type
         direction: $scope.order.direction
         content: $scope.message.content
+        photo: $scope.message.photo
         price: $scope.price
         hashtags: extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
         poi: 
@@ -371,6 +432,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       $scope.poiMessage =
         name: ""
         coord: []
+        photo: null
 
       $scope.panelAddShow = false
 

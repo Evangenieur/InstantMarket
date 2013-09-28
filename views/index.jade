@@ -18,12 +18,15 @@ block content
             textarea(ng-model="message.content", on-focus="inputFocus()",placeholder="Enter your order here")
             input(ng-model="message.price",placeholder="price here")
 
+            img(ng-src="{{message.photo}}",width=120)
+            photo-input(file-input="file",on-change="readFile()",)
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Merci de rentrer ton pseudo
           input#pseudoprompt(type="text", placeholder="Pseudo…", ng-model="me.username", class="modal__input")
           br
           input(type="submit", value="Valider", class="modal__submit")
+    
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
         .chat
@@ -43,6 +46,7 @@ block content
               ng-animate=" 'slide' "
             )
             li(class="message {{order.direction}}")
+              img(ng-src="{{order.photo}}",width=120)
               span.message__user
                 a(ng-href="{{order.author.link}}",target="_blank")
                   {{order.author.username}}

@@ -105,6 +105,27 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       });
     }
   };
+}).directive('photoInput', function($parse) {
+  console.log("in photoinput");
+  return {
+    restrict: 'EA',
+    template: "<input type='file' accept='image/*;capture=camera' />",
+    replace: true,
+    link: function($scope, element, attrs) {
+      var modelGet, modelSet, onChange, updateModel;
+      console.log("link in photoinput");
+      modelGet = $parse(attrs.fileInput);
+      modelSet = modelGet.assign;
+      onChange = $parse(attrs.onChange);
+      updateModel = function() {
+        return scope.$apply(function() {
+          modelSet(scope, element[0].files[0]);
+          return onChange(scope);
+        });
+      };
+      return element.bind('change', updateModel);
+    }
+  };
 }).factory("hashchange", function($rootScope) {
   var last_hash;
   last_hash = window.location.hash;
@@ -193,7 +214,49 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     });
     return doc;
   };
-}).controller('AppCtrl', function($scope, $filter, $http, socket, hashchange, $timeout, localStorageService, sharedDoc) {
+}).factory('fileReader', function($q, $log) {
+  var getReader, onError, onLoad, onProgress, readAsDataURL;
+  onLoad = function(reader, deferred, scope) {
+    return function() {
+      return scope.$apply(function() {
+        return deferred.resolve(reader.result);
+      });
+    };
+  };
+  onError = function(reader, deferred, scope) {
+    return function() {
+      return scope.$apply(function() {
+        return deferred.reject(reader.result);
+      });
+    };
+  };
+  onProgress = function(reader, scope) {
+    return function(event) {
+      return scope.$broadcast("fileProgress", {
+        total: event.total,
+        loaded: event.loaded
+      });
+    };
+  };
+  getReader = function(deferred, scope) {
+    var reader;
+    reader = new FileReader();
+    reader.onload = onLoad(reader, deferred, scope);
+    reader.onerror = onError(reader, deferred, scope);
+    reader.onprogress = onProgress(reader, scope);
+    return reader;
+  };
+  readAsDataURL = function(file, scope) {
+    var deferred, reader;
+    deferred = $q.defer();
+    reader = getReader(deferred, scope);
+    reader.readAsDataURL(file);
+    return deferred.promise;
+  };
+  return {
+    readAsDataUrl: readAsDataURL
+  };
+}).controller('AppCtrl', function($scope, $filter, $http, socket, hashchange, $timeout, localStorageService, sharedDoc, fileReader) {
   var add_or_update_channel, colorMarker, extractHashtags, first_connection, update_channel_state, _ref;
   window.scope = $scope;
   first_connection = true;
@@ -391,6 +454,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       return ht.slice(1);
     });
   };
+  $scope.readFile = function() {
+    console.log("fileReader", $scope, this);
+    return fileReader.readAsDataUrl($scope.file, $scope).then(function(result) {
+      return $scope.message.photo = result;
+    });
+  };
   $scope.sendMessage = function() {
     var doc;
     console.log("Sending.Message", $scope.message.content);
@@ -412,6 +481,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       type: $scope.order.type,
       direction: $scope.order.direction,
       content: $scope.message.content,
+      photo: $scope.message.photo,
       price: $scope.price,
       hashtags: extractHashtags($scope.message.content).concat([$scope.order.direction, $scope.order.type]),
       poi: {
@@ -423,7 +493,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     $scope.message.content = "";
     $scope.poiMessage = {
       name: "",
-      coord: []
+      coord: [],
+      photo: null
     };
     return $scope.panelAddShow = false;
   };
