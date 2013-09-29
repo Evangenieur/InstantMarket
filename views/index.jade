@@ -4,7 +4,7 @@ block content
   .app
       ul.notifs
         li.notif(ng-repeat="notif in notifs")
-          a(ng-click="set_chat(notif)",href="#") Chat message on bid for {{notif.content}}
+          a(ng-click="set_chat(notif)",href="#") Received message on bid for {{notif.content}}
       .top-bar
           button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
@@ -76,9 +76,9 @@ block content
             )
             li(class="message {{order.direction}}")
               p.message__content
-                a(ng-href="{{order.author.link}}",target="_blank")
-                  {{order.author.username}}
-                |  is 
+                a(ng-if="me.id != order.author.id" ng-href="{{order.author.link}}",target="_blank")
+                  {{order.author.username}} is 
+                span(ng-if="me.id == order.author.id") I am 
                 {{order.direction}}ing
                 |  a 
                 {{order.type}}
@@ -95,7 +95,8 @@ block content
                 .rich-content(ng-bind-html-unsafe="order.rich")
                 button(ng-if="order.direction == 'sell' && me.id != order.author.id",class="btn",ng-click="completeTransaction(order)") Buy now
                 button(ng-if="order.direction == 'buy' && me.id != order.author.id",class="btn",ng-click="completeTransaction(order)") Sell now
-                button(ng-if="me.id != order.author.id", ng-click="set_chat(order)" class="btn") Chat
+                button(ng-if="me.id != order.author.id", ng-click="set_chat(order)" class="btn") Send message
+                button(ng-if="me.id == order.author.id", ng-click="set_chat(order)" class="btn") Message inbox
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
                   {{order.poi.name}}
@@ -174,12 +175,12 @@ block content
               img(ng-src="{{order.photo}}",width=120)
                 .rich-content(ng-bind-html-unsafe="order.rich")
               br
-              button(ng-click="set_chat(order)" class="btn") Chat
+              button(ng-click="set_chat(order)" class="btn") Send message
               span.poi-attach(ng-if="order.poi.name")
                 i.ss-icon pin
                 {{order.poi.name}}
               span.timeago(timeago="order.post_date")
-      pane(title="Chat", display="chat.show")
+      pane(title="Messages", display="chat.show")
         div(ng-if="chat.order")
           #chat(ng-controller="ChatCtrl")
             ul 
@@ -189,7 +190,7 @@ block content
                     i.ss-icon pin
                     {{chat.order.poi.name}}
                 p.message__content
-                  | Chat with 
+                  | Conversation with 
                   a(ng-href="{{chat.order.author.link}}",target="_blank")
                     {{chat.order.author.username}}
                   |  {{chat.order.direction}}ing 
