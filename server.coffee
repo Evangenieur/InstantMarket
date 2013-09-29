@@ -181,3 +181,5 @@ require("zappajs") PORT, ->
     @data.from = socket_id2user_id[@id]
     otherClient.emit "message", @data
 
+  
+

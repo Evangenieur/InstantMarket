@@ -267,6 +267,10 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         place_name: ""
         position_type: "mine"
         coord: []
+        mine: []
+    
+    $scope.my_orders = null 
+
 
     $scope.$watch "me", (n,o) ->
       unless _(n).isEqual o
@@ -321,9 +325,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         $scope.isMapVisible false
 
       if selectedPane.title isnt "Chat" and $scope.chat.show is true
-        $scope.chat.show = false
-        $scope.chat.order = null
-
+        $scope.unset_chat()
+        
     $scope.order = 
       set: (prop, value) ->
         @[prop] = value
@@ -339,9 +342,30 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     $scope.set_chat = (order) ->
       console.log "chat order", order
-      $scope.notifs = _($scope.notifs).reject (n) -> n is order
+      console.log "pre notifs", $scope.notifs.length
+      console.log "post notifs", $scope.notifs.length
       $scope.chat.show = true
       $scope.chat.order = order
+
+      if order.author.id is $scope.me.id
+        doc = $scope.MarketOrders.get(order.id)
+        doc.set "online", true
+
+        metadata = _($scope.me.order.mine).find( (o) -> o.id is order.id )
+        metadata.update_date = order.update_date
+
+        $scope.notifs = _($scope.notifs).reject (n) -> 
+          console.log "notif", n, "order", order, n.id is order.id
+          n.id is order.id
+
+    $scope.unset_chat = ->
+        console.log "unChat", $scope.my_orders
+        $scope.my_orders.each (order) ->
+          order.set? "online", false
+          console.log "order, offline", order
+        $scope.chat.show = false
+        $scope.chat.order = null
+
 
 
     $scope.refreshMarkers = ->
@@ -349,7 +373,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       _($filter('matchCurrentChannels') $scope.orders, $scope.current_channels)
       .each (order) ->
-        if order.poi and order.poi.coord?.length
+        if order.poi and orde
+          r.poi.coord?.length
           $scope.markers.push(
             latitude: order.poi.coord[0]
             longitude: order.poi.coord[1]
@@ -457,6 +482,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         post_date: now = (new Date()).toISOString()
         update_date: now
         chats: []
+        online: false
 
       $scope.message.content = ""
       $scope.poiMessage =
@@ -499,13 +525,30 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
             $scope[doc_name].on "remove", ->
               $scope.orders = (row.state for id, row of $scope[doc_name].rows)
               #$scope.refreshMarkers()
-            $scope[doc_name].on "row_update", (row) ->
-              console.log "row_update", arguments
-              author = row.get("author")
-              if author.id is $scope.me.id
-                if row.get("update_date") isnt row.get("post_date")
-                  unless _($scope.notifs).find((n) -> n.content is row.get 'content')
-                    $scope.notifs.push row.state
+  
+      $scope.my_orders = $scope.MarketOrders.createSet (state) ->
+        state.author.id is $scope.me.id
+      
+      ###
+      $scope.my_orders.on "add", (order) ->
+        known_order_changes order
+        
+      $scope.my_orders.on "remove", (order) ->
+      ###
+      $scope.my_orders.on "changes", (order) ->
+        console.log "my set order change", arguments
+        $scope.me.order.mine or= []
+        unless metadata = _($scope.me.order.mine).find( (o) -> o.id is order.id )
+          console.log "no metadata"
+          $scope.me.order.mine.push metadata = 
+            id: order.id
+            update_date: order.update_date
+
+        console.log "metadata", metadata
+
+        if order.update_date isnt metadata.update_date and $scope.chat.order?.id isnt order.id
+          $scope.notifs.push order.state unless _($scope.notifs).find((o) -> o.id is order.id)
+
 
 
 
@@ -605,13 +648,21 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         if attrs.timeago
           time = scope.$eval(attrs.timeago)
           elem.text(jQuery.timeago(time))
-          $timeout(updateTime, 15000)
+          #$timeout(updateTime, 15000)
       scope.$watch(attrs.timeago, updateTime);
   ).
   controller('ChatCtrl', ($scope, $filter, socket, webrtc) ->
     console.log "ChatCtrl", window.scope2 = $scope
     
     $scope.text = ""
+    
+    order_id = $scope.chat.order.id
+    order = $scope.MarketOrders.get order_id
+    console.log "chat order", order
+    order.on "change", (order) ->
+      console.log "change on order ", order
+
+
     $scope.sendTxt = ->
       return if $scope.text is ""
       doc = $scope.MarketOrders.get($scope.chat.order.id)
@@ -692,12 +743,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           , 1000
 
       webrtc.out_message = (msg) ->
-        console.log "WEBRTC.OUT", msg.type
+        #console.log "WEBRTC.OUT", msg.type
         socket.emit "message", msg
       
 
       socket.on "message", (msg) ->
-        console.log "WEBRTC.IN", msg.type, msg
+        #console.log "WEBRTC.IN", msg.type, msg
         unless _($scope.users).find( (user) -> msg.from is user.id )
           $scope.users.push 
             id: msg.from
@@ -780,7 +831,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
     parser = new UAParser()
     ua = parser.getResult()
-    console.log ua
     
     if ua.browser.name.match(/Chrom(e|ium)/)
       peerConnectionConfig.iceServers.push 
@@ -852,13 +902,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
               events.ready()
 
       in_message: (msg) ->
-        console.log "in_message, @started?", @started
+        #console.log "in_message, @started?", @started
         unless @started
           @waiting_msgs.push msg
           return
 
         peers = webrtc.getPeers msg.from
-        console.log "on message", msg.type, peers.length
+        #console.log "on message", msg.type, peers.length
         unless peers.length
           @add_peer msg.from
           peers = webrtc.getPeers msg.from
@@ -882,7 +932,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           @users.push user_id
       
       ready: ->
-        console.log "READY"
+        console.log "READY", "waiting msgs", @waiting_msgs.length
         @started = true
 
         while user_id = @users.pop()

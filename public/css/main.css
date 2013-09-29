@@ -680,6 +680,13 @@ a.message__hash {
     color: #339999;
   }
 
+.cams-container {
+  display: block;
+}
+.cams {
+  padding-right: 5px;
+  display: inline;
+}
 .cams video {
   border: 1px solid gray;
   width: 310px;

@@ -313,9 +313,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     order: {
       place_name: "",
       position_type: "mine",
-      coord: []
+      coord: [],
+      mine: []
     }
   };
+  $scope.my_orders = null;
   $scope.$watch("me", function(n, o) {
     var _this = this;
     if (!_(n).isEqual(o)) {
@@ -368,8 +370,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       $scope.isMapVisible(false);
     }
     if (selectedPane.title !== "Chat" && $scope.chat.show === true) {
-      $scope.chat.show = false;
-      return $scope.chat.order = null;
+      return $scope.unset_chat();
     }
   };
   $scope.order = {
@@ -389,18 +390,44 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     order: null
   };
   $scope.set_chat = function(order) {
+    var doc, metadata;
     console.log("chat order", order);
-    $scope.notifs = _($scope.notifs).reject(function(n) {
-      return n === order;
-    });
+    console.log("pre notifs", $scope.notifs.length);
+    console.log("post notifs", $scope.notifs.length);
     $scope.chat.show = true;
-    return $scope.chat.order = order;
+    $scope.chat.order = order;
+    if (order.author.id === $scope.me.id) {
+      doc = $scope.MarketOrders.get(order.id);
+      doc.set("online", true);
+      metadata = _($scope.me.order.mine).find(function(o) {
+        return o.id === order.id;
+      });
+      metadata.update_date = order.update_date;
+      return $scope.notifs = _($scope.notifs).reject(function(n) {
+        console.log("notif", n, "order", order, n.id === order.id);
+        return n.id === order.id;
+      });
+    }
+  };
+  $scope.unset_chat = function() {
+    console.log("unChat", $scope.my_orders);
+    $scope.my_orders.each(function(order) {
+      if (typeof order.set === "function") {
+        order.set("online", false);
+      }
+      return console.log("order, offline", order);
+    });
+    $scope.chat.show = false;
+    return $scope.chat.order = null;
   };
   $scope.refreshMarkers = function() {
     $scope.markers = [];
     return _($filter('matchCurrentChannels')($scope.orders, $scope.current_channels)).each(function(order) {
       var _ref1;
-      if (order.poi && ((_ref1 = order.poi.coord) != null ? _ref1.length : void 0)) {
+      if (order.poi && orde) {
+        if ((_ref1 = r.poi.coord) != null) {
+          _ref1.length;
+        }
         return $scope.markers.push({
           latitude: order.poi.coord[0],
           longitude: order.poi.coord[1],
@@ -522,7 +549,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       },
       post_date: now = (new Date()).toISOString(),
       update_date: now,
-      chats: []
+      chats: [],
+      online: false
     });
     $scope.message.content = "";
     $scope.poiMessage = {
@@ -604,7 +632,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               return _results;
             })();
           });
-          $scope[doc_name].on("remove", function() {
+          return $scope[doc_name].on("remove", function() {
             var id, row;
             return $scope.orders = (function() {
               var _ref1, _results;
@@ -617,20 +645,38 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               return _results;
             })();
           });
-          return $scope[doc_name].on("row_update", function(row) {
-            var author;
-            console.log("row_update", arguments);
-            author = row.get("author");
-            if (author.id === $scope.me.id) {
-              if (row.get("update_date") !== row.get("post_date")) {
-                if (!_($scope.notifs).find(function(n) {
-                  return n.content === row.get('content');
-                })) {
-                  return $scope.notifs.push(row.state);
-                }
-              }
-            }
-          });
+      }
+    });
+    $scope.my_orders = $scope.MarketOrders.createSet(function(state) {
+      return state.author.id === $scope.me.id;
+    });
+    /*
+    $scope.my_orders.on "add", (order) ->
+      known_order_changes order
+      
+    $scope.my_orders.on "remove", (order) ->
+    */
+
+    $scope.my_orders.on("changes", function(order) {
+      var metadata, _base, _ref1;
+      console.log("my set order change", arguments);
+      (_base = $scope.me.order).mine || (_base.mine = []);
+      if (!(metadata = _($scope.me.order.mine).find(function(o) {
+        return o.id === order.id;
+      }))) {
+        console.log("no metadata");
+        $scope.me.order.mine.push(metadata = {
+          id: order.id,
+          update_date: order.update_date
+        });
+      }
+      console.log("metadata", metadata);
+      if (order.update_date !== metadata.update_date && ((_ref1 = $scope.chat.order) != null ? _ref1.id : void 0) !== order.id) {
+        if (!_($scope.notifs).find(function(o) {
+          return o.id === order.id;
+        })) {
+          return $scope.notifs.push(order.state);
+        }
       }
     });
     hashchange.on(current_channel = function(hash) {
@@ -728,16 +774,22 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         var time;
         if (attrs.timeago) {
           time = scope.$eval(attrs.timeago);
-          elem.text(jQuery.timeago(time));
-          return $timeout(updateTime, 15000);
+          return elem.text(jQuery.timeago(time));
         }
       };
       return scope.$watch(attrs.timeago, updateTime);
     }
   };
 }).controller('ChatCtrl', function($scope, $filter, socket, webrtc) {
+  var order, order_id;
   console.log("ChatCtrl", window.scope2 = $scope);
   $scope.text = "";
+  order_id = $scope.chat.order.id;
+  order = $scope.MarketOrders.get(order_id);
+  console.log("chat order", order);
+  order.on("change", function(order) {
+    return console.log("change on order ", order);
+  });
   $scope.sendTxt = function() {
     var chats, doc, now;
     if ($scope.text === "") {
@@ -827,11 +879,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       }, 1000);
     };
     webrtc.out_message = function(msg) {
-      console.log("WEBRTC.OUT", msg.type);
       return socket.emit("message", msg);
     };
     socket.on("message", function(msg) {
-      console.log("WEBRTC.IN", msg.type, msg);
       if (!_($scope.users).find(function(user) {
         return msg.from === user.id;
       })) {
@@ -933,7 +983,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
   };
   parser = new UAParser();
   ua = parser.getResult();
-  console.log(ua);
   if (ua.browser.name.match(/Chrom(e|ium)/)) {
     peerConnectionConfig.iceServers.push({
       url: "turn:test@watsh.tv:3478",
@@ -1030,13 +1079,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     },
     in_message: function(msg) {
       var peers;
-      console.log("in_message, @started?", this.started);
       if (!this.started) {
         this.waiting_msgs.push(msg);
         return;
       }
       peers = webrtc.getPeers(msg.from);
-      console.log("on message", msg.type, peers.length);
       if (!peers.length) {
         this.add_peer(msg.from);
         peers = webrtc.getPeers(msg.from);
@@ -1067,7 +1114,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     },
     ready: function() {
       var msg, user_id, _results;
-      console.log("READY");
+      console.log("READY", "waiting msgs", this.waiting_msgs.length);
       this.started = true;
       while (user_id = this.users.pop()) {
         this.add_peer(user_id);
