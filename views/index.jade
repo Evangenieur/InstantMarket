@@ -117,10 +117,11 @@ block content
         div(class="me-block")
           h1 Who I am
           fieldset
-            span My name or business name is 
-            input(name="username",ng-model="me.username",placeholder="Your name here")
-            span  and I am located 
-            input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
+            span My name/business name is 
+            input.text(name="username",ng-model="me.username",placeholder="Your name...")
+            hr
+            span I am located 
+            input.text(name="position_name",ng-model="me.order.place_name",placeholder="Your place name..")
 
             span.post__poi(ng-show='poiMessage.name.length > 0')
               i.ss-icon(ng-click="poiMessage.name = ''") delete
@@ -133,12 +134,17 @@ block content
               ul.poi-search__results
                 li(ng-repeat="result in poiResults")
                   span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
-            
+
+            hr.whichis
             span  which is
-            input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
-            label(for="my_position") my personal or
-            input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
-            label(for="company_position") business location          
+            label.personal(for="my_position")
+              input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+              | my personal 
+            | or
+            label.business(for="company_position")
+              input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+              | business
+            | location
 
         div(class="me-block")
           h1 My Orders

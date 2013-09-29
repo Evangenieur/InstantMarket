@@ -52,7 +52,9 @@ b {
 .header {
   background: #242424;
   position: relative;
-  box-shadow: 0 1px 0 black; }
+  box-shadow: 0 1px 0 black; 
+  padding: 5px;
+}
   .header:after {
     content: "";
     display: table;
@@ -61,23 +63,26 @@ b {
 .header__logo {
   font-size: 36px;
   color: #fff;
+  margin-bottom: 2px;
 }
   .header__logo img {
     display: inline-block;
-    margin: 8px 0;
+    margin: 5px;
     vertical-align: text-top;
-    height: 30px    }
+    height: 30px
+  }
 
 #city {
   color: white;
-  font-size: 26px;
+  font-size: 22px;
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   vertical-align: bottom;
-  margin-left: 10px; }
+}
 
 #total_connected {
-  color: #fff; }
+  color: #fff;
+}
 
 .ss-icon, #nav-toggle {
   font-family: 'SS Standard';
@@ -190,11 +195,12 @@ b {
     color: #212121;
     display: inline-block; }
   .chan.is-active {
-    background: #2bc069;
-    border: 1px solid #28b362;
-    box-shadow: 0 2px 0 #28b362, 0 3px 0 #26ab5e; }
+    background: #333;
+    border: 1px solid #333;
+  }
   .chan.is-active a {
-    color: white; }
+    color: white; 
+  }
 
 .chan__name, .chan__nb-users, .chan__nb-pois {
   display: inline-block;
@@ -728,6 +734,45 @@ a.message__hash {
   padding: 10px 10px;
   margin:0px 5px;
   width: 70%;
+  border: 1px solid #338888;
+  border-radius: 5px;
+}
+
+.me-block hr {
+  margin-bottom: 4px;
+  visibility: hidden;
+}
+.me-block hr.whichis {
+  padding-bottom: 9px !important;
+
+}
+
+.me-block span {
+    display: inline-block;
+    width: 200px;
+}
+.me-block .svg-icon {
+
+}
+.me-block label.personal,
+.me-block label.business {
+  border: 1px solid #338888;
+  padding: 3px 10px 3px 8px;
+  margin:0px 5px;
+  color: #338888;
+  border-radius: 5px;
+  background: #F5F5F5;
+}
+.me-block input[type="radio"] {
+  margin-right: 10px;
+}
+.me-block input[type="submit"] {
+  margin-right: 10px;
+}
+.me-block input.text {
+  padding: 10px 10px;
+  margin: 0px 5px;
+  width: 50%;
   border: 1px solid #338888;
   border-radius: 5px;
 }
