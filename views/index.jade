@@ -8,7 +8,6 @@ block content
       .top-bar
           button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
-        form.post(ng-submit="sendMessage()")
           
           //- button.post__submit(type="submit")
           //-   i.ss-icon send
@@ -17,18 +16,19 @@ block content
           .post__message
 
              h2 Submit a bid
+
              div(class="description") 
                 span I want to 
-                label.buy(for="buy") 
+                label.buy(for="buy")
                   input(id="buy",type="radio",ng-model="order.direction",value="buy")
                   | Buy
                 | or 
-                label.Sell(for="sell") 
+                label.Sell(for="sell")
                   input(id="sell",type="radio",ng-model="order.direction",value="sell")
                   | Sell
                 hr
                 span A 
-                label.service(for="service") 
+                label.service(for="service")
                   input(id="service",type="radio",ng-model="order.type",value="service")
                   | Service
                 | or
@@ -36,8 +36,8 @@ block content
                   input(id="product",type="radio",ng-model="order.type",value="product") 
                   | Product
                 hr
-                span It is called a 
-                input(type="text",ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid...")
+                span It is a 
+                input(type="text",ng-model="message.content",on-focus="inputFocus()",placeholder="Describe your bid...")
                 hr
                 span My bid is  
                 input(type="text",ng-model="message.price",placeholder="Enter your price...")

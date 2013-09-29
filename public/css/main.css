@@ -712,7 +712,7 @@ a.message__hash {
 .post__message label.product,
 .post__message label.service {
   border: 1px solid #338888;
-  padding: 3px 8px 3px 10px;
+  padding: 3px 10px 3px 8px;
   margin:0px 5px;
   color: #338888;
   border-radius: 5px;
@@ -721,10 +721,13 @@ a.message__hash {
 .post__message input[type="radio"] {
   margin-right: 10px;
 }
+.post__message input[type="submit"] {
+  margin-right: 10px;
+}
 .post__message input[type="text"] {
   padding: 10px 10px;
   margin:0px 5px;
-  width: 240px;
+  width: 70%;
   border: 1px solid #338888;
   border-radius: 5px;
 }
