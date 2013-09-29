@@ -737,3 +737,42 @@ a.message__hash {
   border: 1px solid #338888;
   border-radius: 5px;
 }
+
+.me-block hr {
+  margin-bottom: 4px;
+  visibility: hidden;
+}
+.me-block hr.whichis {
+  padding-bottom: 9px !important;
+
+}
+
+.me-block span {
+    display: inline-block;
+    width: 200px;
+}
+.me-block .svg-icon {
+
+}
+.me-block label.personal,
+.me-block label.business {
+  border: 1px solid #338888;
+  padding: 3px 10px 3px 8px;
+  margin:0px 5px;
+  color: #338888;
+  border-radius: 5px;
+  background: #F5F5F5;
+}
+.me-block input[type="radio"] {
+  margin-right: 10px;
+}
+.me-block input[type="submit"] {
+  margin-right: 10px;
+}
+.me-block input.text {
+  padding: 10px 10px;
+  margin: 0px 5px;
+  width: 50%;
+  border: 1px solid #338888;
+  border-radius: 5px;
+}
