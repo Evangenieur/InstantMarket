@@ -52,7 +52,9 @@ b {
 .header {
   background: #242424;
   position: relative;
-  box-shadow: 0 1px 0 black; }
+  box-shadow: 0 1px 0 black; 
+  padding: 5px;
+}
   .header:after {
     content: "";
     display: table;
@@ -61,23 +63,26 @@ b {
 .header__logo {
   font-size: 36px;
   color: #fff;
+  margin-bottom: 2px;
 }
   .header__logo img {
     display: inline-block;
-    margin: 8px 8px;
+    margin: 5px;
     vertical-align: text-top;
-    height: 30px    }
+    height: 30px
+  }
 
 #city {
   color: white;
   font-size: 22px;
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   vertical-align: bottom;
-  margin-left: 0px; }
+}
 
 #total_connected {
-  color: #fff; }
+  color: #fff;
+}
 
 .ss-icon, #nav-toggle {
   font-family: 'SS Standard';
@@ -192,10 +197,10 @@ b {
   .chan.is-active {
     background: #333;
     border: 1px solid #333;
-
   }
   .chan.is-active a {
-    color: white; }
+    color: white; 
+  }
 
 .chan__name, .chan__nb-users, .chan__nb-pois {
   display: inline-block;
