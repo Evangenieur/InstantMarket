@@ -324,7 +324,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       else
         $scope.isMapVisible false
 
-      if selectedPane.title isnt "Chat" and $scope.chat.show is true
+      if selectedPane.title isnt "Messages" and $scope.chat.show is true
         $scope.unset_chat()
         
     $scope.order = 

@@ -369,7 +369,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     } else {
       $scope.isMapVisible(false);
     }
-    if (selectedPane.title !== "Chat" && $scope.chat.show === true) {
+    if (selectedPane.title !== "Messages" && $scope.chat.show === true) {
       return $scope.unset_chat();
     }
   };
