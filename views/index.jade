@@ -17,27 +17,32 @@ block content
           .post__message
 
              h2 Submit a bid
-             div(class="description") I want to 
-                input(id="buy",type="radio",ng-model="order.direction",value="buy")
-                label(for="buy") Buy
-                |  or 
-                input(id="sell",type="radio",ng-model="order.direction",value="sell")
-                label(for="sell") Sell
-                br
-                | A
-                input(id="service",type="radio",ng-model="order.type",value="service")
-                label(for="service") Service 
+             div(class="description") 
+                span I want to 
+                label.buy(for="buy") 
+                  input(id="buy",type="radio",ng-model="order.direction",value="buy")
+                  | Buy
+                | or 
+                label.Sell(for="sell") 
+                  input(id="sell",type="radio",ng-model="order.direction",value="sell")
+                  | Sell
+                hr
+                span A 
+                label.service(for="service") 
+                  input(id="service",type="radio",ng-model="order.type",value="service")
+                  | Service
                 | or
-                input(id="product",type="radio",ng-model="order.type",value="product")
-                label(for="product") Product
-                br
-                | It is a 
-                input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here")
-                br
-                | My bid is  
-                input(ng-model="message.price",placeholder="enter your price here")
-                br
-                | and it looks like 
+                label.product(for="product")
+                  input(id="product",type="radio",ng-model="order.type",value="product") 
+                  | Product
+                hr
+                span It is called a 
+                input(type="text",ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid...")
+                hr
+                span My bid is  
+                input(type="text",ng-model="message.price",placeholder="Enter your price...")
+                hr
+                span It looks like 
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
               input(type="submit", value="Submit", class="modal__submit")

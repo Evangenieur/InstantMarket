@@ -688,15 +688,43 @@ a.message__hash {
   background-size: 150px;
 }
   #chat .chat-control {
-        margin: 20px 0 30px 0;
+      margin: 20px 0 30px 0;
   }
-
   #chat input[type="text"] {
     padding: 7px 1% ;
     width: 80%;
     border: 1px solid #CCC;
-
   }
   #chat button.btn.submit {
     width: 15% !important;
   }
+
+.post__message hr {
+  margin-bottom: 3px;
+  visibility: hidden;
+}
+.post__message span {
+    display: inline-block;
+    width: 100px;
+}
+.post__message label.buy,
+.post__message label.sell,
+.post__message label.product,
+.post__message label.service {
+  border: 1px solid #338888;
+  padding: 3px 8px 3px 10px;
+  margin:0px 5px;
+  color: #338888;
+  border-radius: 5px;
+  background: #F5F5F5;
+}
+.post__message input[type="radio"] {
+  margin-right: 10px;
+}
+.post__message input[type="text"] {
+  padding: 10px 10px;
+  margin:0px 5px;
+  width: 240px;
+  border: 1px solid #338888;
+  border-radius: 5px;
+}
