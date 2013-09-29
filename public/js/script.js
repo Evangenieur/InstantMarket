@@ -377,8 +377,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     set: function(prop, value) {
       return this[prop] = value;
     },
-    type: "Service",
-    direction: "Sell"
+    type: "product",
+    direction: "sell"
   };
   $scope.poiResults = [];
   $scope.poiMessage = {
@@ -424,10 +424,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     $scope.markers = [];
     return _($filter('matchCurrentChannels')($scope.orders, $scope.current_channels)).each(function(order) {
       var _ref1;
-      if (order.poi && orde) {
-        if ((_ref1 = r.poi.coord) != null) {
-          _ref1.length;
-        }
+      if (order.poi && ((_ref1 = order.poi.coord) != null ? _ref1.length : void 0)) {
         return $scope.markers.push({
           latitude: order.poi.coord[0],
           longitude: order.poi.coord[1],
@@ -507,6 +504,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       return $scope.message.photo = result;
     });
   };
+  $scope.completeTransaction = function(order) {
+    var doc;
+    doc = $scope.MarketOrders.get(order.id);
+    doc.set("completed", $scope.me.id);
+    return doc.set("update_date", (new Date()).toISOString());
+  };
   $scope.sendMessage = function() {
     var doc, hashtag, hashtags, now, stats, _i, _len;
     console.log("Sending.Message", $scope.message.content);
@@ -526,9 +529,17 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       console.log("hashtag", hashtag);
       doc = $scope.Hashtags.get(hashtag);
       console.log("doc", doc);
-      stats = doc.get("stats");
-      stats || (stats = {});
+      if (!doc.get("name")) {
+        doc.set("name", hashtag);
+      }
+      if (!(stats = doc.get("stats"))) {
+        stats = {
+          users: 0,
+          pois: 0
+        };
+      }
       stats.users++;
+      console.log("setting stats for " + hashtag, stats);
       doc.set("stats", stats);
     }
     doc = $scope.MarketOrders.add({
@@ -605,7 +616,20 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               return _results;
             })();
           });
-          return $scope[doc_name].on("remove", function() {
+          $scope[doc_name].on("remove", function() {
+            var id, row;
+            return $scope.channels = (function() {
+              var _ref1, _results;
+              _ref1 = $scope[doc_name].rows;
+              _results = [];
+              for (id in _ref1) {
+                row = _ref1[id];
+                _results.push(row.state);
+              }
+              return _results;
+            })();
+          });
+          return $scope[doc_name].on("row_update", function() {
             var id, row;
             return $scope.channels = (function() {
               var _ref1, _results;
@@ -621,26 +645,81 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         case "MarketOrders":
           $scope[doc_name].on("add", function() {
             var id, row;
-            return $scope.orders = (function() {
+            $scope.orders = (function() {
               var _ref1, _results;
               _ref1 = $scope[doc_name].rows;
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                _results.push(row.state);
+                if (!row.state.completed) {
+                  _results.push(row.state);
+                }
+              }
+              return _results;
+            })();
+            return $scope.transactions = (function() {
+              var _ref1, _results;
+              _ref1 = $scope[doc_name].rows;
+              _results = [];
+              for (id in _ref1) {
+                row = _ref1[id];
+                if (row.state.completed === $scope.me.id) {
+                  _results.push(row.state);
+                }
               }
               return _results;
             })();
           });
-          return $scope[doc_name].on("remove", function() {
+          $scope[doc_name].on("remove", function() {
             var id, row;
-            return $scope.orders = (function() {
+            $scope.orders = (function() {
               var _ref1, _results;
               _ref1 = $scope[doc_name].rows;
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                _results.push(row.state);
+                if (!row.state.completed) {
+                  _results.push(row.state);
+                }
+              }
+              return _results;
+            })();
+            return $scope.transactions = (function() {
+              var _ref1, _results;
+              _ref1 = $scope[doc_name].rows;
+              _results = [];
+              for (id in _ref1) {
+                row = _ref1[id];
+                if (row.state.completed === $scope.me.id) {
+                  _results.push(row.state);
+                }
+              }
+              return _results;
+            })();
+          });
+          return $scope[doc_name].on("row_update", function() {
+            var id, row;
+            $scope.orders = (function() {
+              var _ref1, _results;
+              _ref1 = $scope[doc_name].rows;
+              _results = [];
+              for (id in _ref1) {
+                row = _ref1[id];
+                if (!row.state.completed) {
+                  _results.push(row.state);
+                }
+              }
+              return _results;
+            })();
+            return $scope.transactions = (function() {
+              var _ref1, _results;
+              _ref1 = $scope[doc_name].rows;
+              _results = [];
+              for (id in _ref1) {
+                row = _ref1[id];
+                if (row.state.completed === $scope.me.id) {
+                  _results.push(row.state);
+                }
               }
               return _results;
             })();
@@ -648,7 +727,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       }
     });
     $scope.my_orders = $scope.MarketOrders.createSet(function(state) {
-      return state.author.id === $scope.me.id;
+      var _ref1;
+      return (state != null ? (_ref1 = state.author) != null ? _ref1.id : void 0 : void 0) === $scope.me.id;
     });
     /*
     $scope.my_orders.on "add", (order) ->

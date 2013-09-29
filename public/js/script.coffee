@@ -330,8 +330,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
     $scope.order = 
       set: (prop, value) ->
         @[prop] = value
-      type: "Service"
-      direction: "Sell"
+      type: "product"
+      direction: "sell"
     $scope.poiResults = []
     $scope.poiMessage =
       name: ""
@@ -373,8 +373,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       _($filter('matchCurrentChannels') $scope.orders, $scope.current_channels)
       .each (order) ->
-        if order.poi and orde
-          r.poi.coord?.length
+        if order.poi and order.poi.coord?.length
           $scope.markers.push(
             latitude: order.poi.coord[0]
             longitude: order.poi.coord[1]
@@ -443,6 +442,12 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
       fileReader.readAsDataUrl($scope.file, $scope).then (result) ->
         $scope.message.photo = result
 
+    $scope.completeTransaction = (order) ->
+      doc = $scope.MarketOrders.get(order.id)
+      doc.set "completed", $scope.me.id
+      doc.set "update_date", (new Date()).toISOString()
+
+
     $scope.sendMessage = ->
       console.log "Sending.Message", $scope.message.content
       return unless $scope.message.content
@@ -457,9 +462,14 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         console.log "hashtag", hashtag
         doc = $scope.Hashtags.get(hashtag)
         console.log "doc", doc
-        stats = doc.get "stats"
-        stats or= {}
+        unless doc.get "name"
+          doc.set "name", hashtag
+        unless stats = doc.get "stats"
+          stats = 
+            users: 0
+            pois: 0
         stats.users++
+        console.log "setting stats for #{hashtag}", stats
         doc.set "stats", stats
 
       doc = $scope.MarketOrders.add
@@ -518,16 +528,24 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
               $scope.channels = (row.state for id, row of $scope[doc_name].rows)
             $scope[doc_name].on "remove", ->
               $scope.channels = (row.state for id, row of $scope[doc_name].rows)
+            $scope[doc_name].on "row_update", ->
+              $scope.channels = (row.state for id, row of $scope[doc_name].rows)
           when "MarketOrders"
             $scope[doc_name].on "add", ->
-              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
+              $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
               #$scope.refreshMarkers()
             $scope[doc_name].on "remove", ->
-              $scope.orders = (row.state for id, row of $scope[doc_name].rows)
+              $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
+              #$scope.refreshMarkers()
+            $scope[doc_name].on "row_update", ->
+              $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
               #$scope.refreshMarkers()
   
       $scope.my_orders = $scope.MarketOrders.createSet (state) ->
-        state.author.id is $scope.me.id
+        state?.author?.id is $scope.me.id
       
       ###
       $scope.my_orders.on "add", (order) ->
