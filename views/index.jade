@@ -18,6 +18,7 @@ block content
              h2 Submit a bid
 
              div(class="description") 
+              form.post(ng-submit="sendMessage()")
                 span I want to 
                 label.buy(for="buy")
                   input(id="buy",type="radio",ng-model="order.direction",value="buy")
@@ -45,7 +46,13 @@ block content
                 span It looks like 
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
+<<<<<<< HEAD
               input(type="submit", value="Submit", class="modal__submit", ng-click="sendMessage()")
+=======
+                hr
+                button.btn(type="submit" style="float:right") Submit
+              button.btn(ng-click="toggleAddOrder()" style="float:left") Cancel
+>>>>>>> 505d6fad66eae4ae37f39724145a2799feaad8c7
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Please enter your name
@@ -90,6 +97,8 @@ block content
                 br
                 img(ng-src="{{order.photo}}",width=120)
                 .rich-content(ng-bind-html-unsafe="order.rich")
+                button(ng-if="order.direction == 'sell'",class="btn") Buy now
+                button(ng-if="order.direction == 'buy'",class="btn") Sell now
                 button(ng-click="set_chat(order)" class="btn") Chat
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
@@ -114,10 +123,11 @@ block content
         div(class="me-block")
           h1 Who I am
           fieldset
-            span My name or business name is 
-            input(name="username",ng-model="me.username",placeholder="Your name here")
-            span  and I am located 
-            input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
+            span My name/business name is 
+            input.text(name="username",ng-model="me.username",placeholder="Your name...")
+            hr
+            span I am located 
+            input.text(name="position_name",ng-model="me.order.place_name",placeholder="Your place name..")
 
             span.post__poi(ng-show='poiMessage.name.length > 0')
               i.ss-icon(ng-click="poiMessage.name = ''") delete
@@ -130,15 +140,45 @@ block content
               ul.poi-search__results
                 li(ng-repeat="result in poiResults")
                   span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
-            
+
+            hr.whichis
             span  which is
-            input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
-            label(for="my_position") my personal or
-            input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
-            label(for="company_position") business location          
+            label.personal(for="my_position")
+              input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+              | my personal 
+            | or
+            label.business(for="company_position")
+              input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+              | business
+            | location
 
         div(class="me-block")
-          h1 My Orders
+          h1 My past transactions
+          ul.message-list-item(
+              ng-repeat="order in orders | orderBy:'post_date':true",
+              ng-animate=" 'slide' "
+            )
+            li(class="message {{order.direction}}")
+              a(ng-href="{{order.author.link}}",target="_blank")
+                  {{order.author.username}} 
+              span(ng-if="order.direction == 'sell'") sold me
+              span(ng-if="order.direction == 'buy'") bought me
+              |  a 
+              {{order.type}}
+              |  of 
+              span(ng-bind-html-unsafe="order.content")
+              |  for
+              span  
+                b {{order.price}}
+              br
+              img(ng-src="{{order.photo}}",width=120)
+                .rich-content(ng-bind-html-unsafe="order.rich")
+              br
+              button(ng-click="set_chat(order)" class="btn") Chat
+              span.poi-attach(ng-if="order.poi.name")
+                i.ss-icon pin
+                {{order.poi.name}}
+              span.timeago(timeago="order.post_date")
       pane(title="Chat", display="chat.show")
         div(ng-if="chat.order")
           #chat(ng-controller="ChatCtrl")
@@ -157,6 +197,8 @@ block content
                   span(ng-bind-html-unsafe="chat.order.content")
                   span  for  
                     b {{chat.order.price}}
+                button(ng-if="chat.order.direction == 'sell'",class="btn") Buy now
+                button(ng-if="chat.order.direction == 'buy'",class="btn") Sell now
                 button(ng-if="me.id != chat.order.author.id",ng-disabled="!chat.order.online",class="btn",ng-click="visio_call()") Visio
                 br
                 br
