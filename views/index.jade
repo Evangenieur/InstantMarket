@@ -46,13 +46,9 @@ block content
                 span It looks like 
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
-<<<<<<< HEAD
-              input(type="submit", value="Submit", class="modal__submit", ng-click="sendMessage()")
-=======
                 hr
                 button.btn(type="submit" style="float:right") Submit
               button.btn(ng-click="toggleAddOrder()" style="float:left") Cancel
->>>>>>> 505d6fad66eae4ae37f39724145a2799feaad8c7
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Please enter your name
