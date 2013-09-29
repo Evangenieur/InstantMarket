@@ -757,9 +757,12 @@ a.message__hash {
 .me-block hr.whichis {
   padding-bottom: 9px !important;
 }
+
+.me-block a {
+  text-decoration: none;
+}
 .me-block span {
     width: 200px;
-    display: inline-block;
 }
 .me-block label.personal,
 .me-block label.business {
