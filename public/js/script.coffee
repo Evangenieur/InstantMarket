@@ -352,6 +352,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         doc.set "online", true
 
         metadata = _($scope.me.order.mine).find( (o) -> o.id is order.id )
+        console.log "metadata", metadata
         metadata.update_date = order.update_date
 
         $scope.notifs = _($scope.notifs).reject (n) -> 
@@ -560,12 +561,18 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           console.log "no metadata"
           $scope.me.order.mine.push metadata = 
             id: order.id
-            update_date: order.update_date
+            update_date: order.state.update_date
 
-        console.log "metadata", metadata
+        console.log "metadata", metadata, 
+          order.state.update_date, metadata.update_date,
+          (new Date(order.state.update_date)).getTime(),
+          (new Date(metadata.update_date)).getTime(),
+          ((new Date(order.state.update_date)).getTime() > (new Date(metadata.update_date)).getTime()), 
+          (not $scope.chat.show or $scope.chat.order?.id isnt order.id)
 
-        if order.update_date isnt metadata.update_date and $scope.chat.order?.id isnt order.id
-          $scope.notifs.push order.state unless _($scope.notifs).find((o) -> o.id is order.id)
+        if ((new Date(order.state.update_date)).getTime() > (new Date(metadata.update_date)).getTime()) and 
+          (not $scope.chat.show or $scope.chat.order?.id isnt order.id)
+            $scope.notifs.push order.state unless _($scope.notifs).find((o) -> o.id is order.id)
 
 
 

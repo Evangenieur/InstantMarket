@@ -402,6 +402,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       metadata = _($scope.me.order.mine).find(function(o) {
         return o.id === order.id;
       });
+      console.log("metadata", metadata);
       metadata.update_date = order.update_date;
       return $scope.notifs = _($scope.notifs).reject(function(n) {
         console.log("notif", n, "order", order, n.id === order.id);
@@ -738,7 +739,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     */
 
     $scope.my_orders.on("changes", function(order) {
-      var metadata, _base, _ref1;
+      var metadata, _base, _ref1, _ref2;
       console.log("my set order change", arguments);
       (_base = $scope.me.order).mine || (_base.mine = []);
       if (!(metadata = _($scope.me.order.mine).find(function(o) {
@@ -747,11 +748,11 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         console.log("no metadata");
         $scope.me.order.mine.push(metadata = {
           id: order.id,
-          update_date: order.update_date
+          update_date: order.state.update_date
         });
       }
-      console.log("metadata", metadata);
-      if (order.update_date !== metadata.update_date && ((_ref1 = $scope.chat.order) != null ? _ref1.id : void 0) !== order.id) {
+      console.log("metadata", metadata, order.state.update_date, metadata.update_date, (new Date(order.state.update_date)).getTime(), (new Date(metadata.update_date)).getTime(), (new Date(order.state.update_date)).getTime() > (new Date(metadata.update_date)).getTime(), !$scope.chat.show || ((_ref1 = $scope.chat.order) != null ? _ref1.id : void 0) !== order.id);
+      if (((new Date(order.state.update_date)).getTime() > (new Date(metadata.update_date)).getTime()) && (!$scope.chat.show || ((_ref2 = $scope.chat.order) != null ? _ref2.id : void 0) !== order.id)) {
         if (!_($scope.notifs).find(function(o) {
           return o.id === order.id;
         })) {

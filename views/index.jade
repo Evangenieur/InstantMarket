@@ -193,8 +193,8 @@ block content
                   span(ng-bind-html-unsafe="chat.order.content")
                   span  for  
                     b {{chat.order.price}}
-                button(ng-if="chat.order.direction == 'sell' && me.id != chat.order.author.id",class="btn",ng-click="completeTransaction(chat.order)") Buy now
-                button(ng-if="chat.order.direction == 'buy' && me.id != chat.order.author.id",class="btn",ng-click="completeTransaction(chat.order)") Sell now
+                button(ng-if="!chat.order.completed && chat.order.direction == 'sell' && me.id != chat.order.author.id",class="btn",ng-click="completeTransaction(chat.order)") Buy now
+                button(ng-if="!chat.order.completed && chat.order.direction == 'buy' && me.id != chat.order.author.id",class="btn",ng-click="completeTransaction(chat.order)") Sell now
                 button(ng-if="me.id != chat.order.author.id",ng-disabled="!chat.order.online",class="btn",ng-click="visio_call()") Visio
                 br
                 br
