@@ -47,8 +47,8 @@ block content
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
                 hr
-                button.btn(type="submit" style="float:left") Submit
-              button.btn(ng-click="toggleAddOrder()" style="float:right") Cancel
+                button.btn(type="submit" style="float:right") Submit
+              button.btn(ng-click="toggleAddOrder()" style="float:left") Cancel
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Please enter your name
