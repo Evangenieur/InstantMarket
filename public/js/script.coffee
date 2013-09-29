@@ -678,6 +678,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         $scope.cam.activated = true
         $scope.cam.enabled = true
         $scope.mic.activated = true
+        $scope.mic.enabled = true
         #$scope.mic.enabled = webrtc.toggleMic()
 
       webrtc.on_remote_camera = (peer) ->

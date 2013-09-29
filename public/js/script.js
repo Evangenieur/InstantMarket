@@ -814,7 +814,8 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       me_in_list.audio = false;
       $scope.cam.activated = true;
       $scope.cam.enabled = true;
-      return $scope.mic.activated = true;
+      $scope.mic.activated = true;
+      return $scope.mic.enabled = true;
     };
     webrtc.on_remote_camera = function(peer) {
       var remote_in_list;
