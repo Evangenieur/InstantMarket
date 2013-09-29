@@ -156,8 +156,7 @@ block content
             )
             li(class="message {{order.direction}}")
               a(ng-href="{{order.author.link}}",target="_blank")
-                  {{order.author.username}}
-              |  has 
+                  {{order.author.username}} 
               span(ng-if="order.direction == 'sell'") sold me
               span(ng-if="order.direction == 'buy'") bought me
               |  a 
