@@ -4,7 +4,7 @@ block content
   .app
       ul.notifs
         li.notif(ng-repeat="notif in notifs")
-          a(ng-click="set_chat(notif)",href="#") Received message on bid for {{notif.content}}
+          a(ng-click="set_chat(notif)",href="#") {{notif_message(notif)}}
       .top-bar
           button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")

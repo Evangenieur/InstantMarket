@@ -534,15 +534,15 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           when "MarketOrders"
             $scope[doc_name].on "add", ->
               $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
-              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id or $scope.me.id is row.state.author.id)
               #$scope.refreshMarkers()
             $scope[doc_name].on "remove", ->
               $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
-              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id or $scope.me.id is row.state.author.id)
               #$scope.refreshMarkers()
             $scope[doc_name].on "row_update", ->
               $scope.orders = (row.state for id, row of $scope[doc_name].rows when not row.state.completed)
-              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id)
+              $scope.transactions = (row.state for id, row of $scope[doc_name].rows when row.state.completed is $scope.me.id or $scope.me.id is row.state.author.id)
               #$scope.refreshMarkers()
   
       $scope.my_orders = $scope.MarketOrders.createSet (state) ->
@@ -572,10 +572,15 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
         if ((new Date(order.state.update_date)).getTime() > (new Date(metadata.update_date)).getTime()) and 
           (not $scope.chat.show or $scope.chat.order?.id isnt order.id)
-            $scope.notifs.push order.state unless _($scope.notifs).find((o) -> o.id is order.id)
+            unless _($scope.notifs).find((o) -> o.id is order.id)
+              $scope.notifs.push order.state 
 
 
-
+      $scope.notif_message = (notif) ->
+        if notif.completed
+          "Someone #{if notif.direction is "sell" then "bought" else "sold"} your bid for #{notif.content}"
+        else
+          "Received message on bid for #{notif.content}"
 
 
 

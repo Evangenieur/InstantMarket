@@ -664,7 +664,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                if (row.state.completed === $scope.me.id) {
+                if (row.state.completed === $scope.me.id || $scope.me.id === row.state.author.id) {
                   _results.push(row.state);
                 }
               }
@@ -691,7 +691,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                if (row.state.completed === $scope.me.id) {
+                if (row.state.completed === $scope.me.id || $scope.me.id === row.state.author.id) {
                   _results.push(row.state);
                 }
               }
@@ -718,7 +718,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                if (row.state.completed === $scope.me.id) {
+                if (row.state.completed === $scope.me.id || $scope.me.id === row.state.author.id) {
                   _results.push(row.state);
                 }
               }
@@ -760,6 +760,13 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
         }
       }
     });
+    $scope.notif_message = function(notif) {
+      if (notif.completed) {
+        return "Someone " + (notif.direction === "sell" ? "bought" : "sold") + " your bid for " + notif.content;
+      } else {
+        return "Received message on bid for " + notif.content;
+      }
+    };
     hashchange.on(current_channel = function(hash) {
       var cur_hash_chans;
       cur_hash_chans = (hash != null ? hash : window.location.hash).split(/\#/).slice(1);
