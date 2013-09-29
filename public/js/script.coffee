@@ -622,7 +622,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
           id: $scope.me.id
         text: $scope.text
         post_date: now = (new Date()).toISOString()
-      doc.set "chats", chats
+      doc.set "chats", JSON.parse(angular.toJson(chats))
       doc.set "update_date", now
       $scope.text = ""
 

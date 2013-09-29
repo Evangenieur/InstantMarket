@@ -59,7 +59,6 @@ b {
     clear: both; }
 
 .header__logo {
-  text-align: center; 
   font-size: 36px;
   color: #fff;
 }
@@ -109,17 +108,13 @@ b {
   .tab-bar .tab-bar__tab {
     float: left;
     border-right: 1px solid #ebebeb; 
-    padding-left: 5px;
-    padding-right: 5px;
   }
 
-    /*
     @media screen and (max-width: 600px) {
       .tab-bar .tab-bar__tab {
         width: 25%; 
       } 
-    
-    */
+    }    
   .tab-bar .tab-bar__link {
     text-transform: uppercase;
     font-size: 12px;
@@ -129,11 +124,11 @@ b {
     text-align: center;
     line-height: 40px;
     text-decoration: none; }
-    /*
+
     @media screen and (min-width: 600px) {
       .tab-bar .tab-bar__link {
         padding: 0 3em; } }
-    */
+
     .tab-bar .tab-bar__link.is-active {
       background: #f5f5f5;
       color: black; }
@@ -173,7 +168,9 @@ b {
   margin-bottom: 1.1em; }
 
 .channels-list {
-  margin-bottom: 30px; }
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
   .channels-list:after {
     content: "";
     display: table;
@@ -208,7 +205,7 @@ b {
   border-right: 1px solid #DDD;
   background: #FFF; }
   .chan.is-active .chan__name {
-    background: #2ecc71;
+    background: #339999;
     border-right: 1px solid rgba(255, 255, 255, 0.3); }
 
 .chan__nb-users, .chan__nb-pois {
@@ -241,9 +238,13 @@ b {
 .message__content {
   color: #666;
   position: relative;
-  padding-bottom: 12px; }
-  .message__content a {
-    color: #2ecc71; }
+  padding-bottom: 12px;
+}
+
+.message__content a {
+    color: #AAA;
+    text-decoration:none;
+}
 
 .poi-attach {
   position: absolute;
@@ -291,31 +292,24 @@ a.message__hash {
   background-color: #F70;
 }
 .btn {
-  background-color: #07F;
+  background-color: #339999;
   color: #fff;
   font-size: 13px;
   border: none;
-  border-right: 1px solid black;
   height: 30px;
-  width: 40%;
+  min-width: 75px;
 }
 .btn.buy {
   background-color: #F70;
 }
 .btn.add {
-  width: 20%;
   font-weight:bold;
   float: right;
 }
 .top-bar {
-  max-height: 100px;
-  min-height: 40px;
-  position: fixed;
+  position: absolute;
   top: 10px;
   right: 20px;
-  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
-  width: 50%;
-  height:100%;
   z-index: 5; 
 }
 .panel-animate-enter, .panel-animate-leave { 
@@ -342,11 +336,11 @@ a.message__hash {
 
 #panel-add {
   /*display: none;*/
-  background-color: #777;
+  background-color: rgba(0,0,0,0.3);
   position: fixed;  
   bottom: 0px;
   width: 100%;
-  height: 50%;
+  height: 100%;
   z-index: 1; 
 }
 .post {
@@ -404,8 +398,28 @@ a.message__hash {
     color: rgba(255, 255, 255, 0.8); }
 
 .post__message {
-  position: relative;
-  width: 90%; }
+    background: white;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    width:50%;
+    z-index: +10000;
+    margin:auto;
+    padding-bottom:10px;
+}
+
+.post__message h2 {
+    background: black;
+    padding: 13px 35px 8px 31px;
+    text-align: center;
+    margin: 0 0 20px;
+    color: white;
+}
+
+.post__message .description {
+    padding: 0px 0px 0px 20px;
+    line-height:30px;
+}
   @media screen and (max-width: 890px) {
     .post__message {
       width: 85%; } }
@@ -439,7 +453,7 @@ a.message__hash {
   .poi-search__name:hover {
     background: #F2F2F2; }
   .poi-search__name:active {
-    background: #2ecc71;
+    background: #339999;
     color: white; }
 
 .post__poi {
@@ -473,7 +487,7 @@ a.message__hash {
 
 .button-squared, .post__submit {
   text-decoration: none;
-  background: #2ecc71;
+  background: #339999;
   color: white; }
 
 .post__submit {
@@ -567,13 +581,19 @@ a.message__hash {
 
 .modal__submit {
   border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #2ecc71;
+  background: #339999;
   color: white;
-  cursor: pointer; }
+  cursor: pointer; 
+  float:right;}
 
 .message-list-item {
-  overflow: hidden;
-  max-height: 150px; }
+  margin-bottom: 10px;
+  margin-right: 20px;
+ }
+
+ .message-list-item img{
+  max-height:100px;
+ }
 
 .slide-enter, .slide-leave {
   -webkit-transition: 0.4s cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
@@ -619,4 +639,21 @@ a.message__hash {
 }
 .notif {
   padding: 5px;  
+}
+
+.me-block {
+  font-size: 14px;
+  line-height: 1.4;
+  background: #FFF;
+  padding: .8em 1em;
+  margin: 20px;
+  border: 1px solid #DDD;
+  padding-left: 10px;
+}
+.me-block h1{
+  background: #f5f5f5;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 5px 5px 5px 5px;
+  margin: 0 0 10px;
 }
