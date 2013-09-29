@@ -93,6 +93,8 @@ block content
                 br
                 img(ng-src="{{order.photo}}",width=120)
                 .rich-content(ng-bind-html-unsafe="order.rich")
+                button(ng-if="order.direction != buy",class="btn") Buy now
+                button(ng-if="order.direction == buy",class="btn") Sell now
                 button(ng-click="set_chat(order)" class="btn") Chat
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
@@ -147,7 +149,33 @@ block content
             | location
 
         div(class="me-block")
-          h1 My Orders
+          h1 My past transactions
+          ul.message-list-item(
+              ng-repeat="order in orders | orderBy:'post_date':true",
+              ng-animate=" 'slide' "
+            )
+            li(class="message {{order.direction}}")
+              a(ng-href="{{order.author.link}}",target="_blank")
+                  {{order.author.username}}
+              |  has 
+              span(ng-if="order.direction != buy") sold me
+              span(ng-if="order.direction == buy") bought me
+              |  a 
+              {{order.type}}
+              |  of 
+              span(ng-bind-html-unsafe="order.content")
+              |  for
+              span  
+                b {{order.price}}
+              br
+              img(ng-src="{{order.photo}}",width=120)
+                .rich-content(ng-bind-html-unsafe="order.rich")
+              br
+              button(ng-click="set_chat(order)" class="btn") Chat
+              span.poi-attach(ng-if="order.poi.name")
+                i.ss-icon pin
+                {{order.poi.name}}
+              span.timeago(timeago="order.post_date")
       pane(title="Chat", display="chat.show")
         div(ng-if="chat.order")
           #chat(ng-controller="ChatCtrl")
@@ -166,6 +194,8 @@ block content
                   span(ng-bind-html-unsafe="chat.order.content")
                   span  for  
                     b {{chat.order.price}}
+                button(ng-if="chat.order.direction != buy",class="btn") Buy now
+                button(ng-if="chat.order.direction == buy",class="btn") Sell now
                 button(ng-if="me.id != chat.order.author.id",class="btn",ng-click="visio_call()") Visio
                 br
                 br

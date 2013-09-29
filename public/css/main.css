@@ -305,6 +305,7 @@ a.message__hash {
   border: none;
   height: 30px;
   min-width: 75px;
+  margin-right: 20px;
 }
 .btn.buy {
   background-color: #F70;
@@ -316,7 +317,7 @@ a.message__hash {
 .top-bar {
   position: absolute;
   top: 10px;
-  right: 20px;
+  right: 0px;
 }
 .panel-animate-enter, .panel-animate-leave { 
     -webkit-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
@@ -748,7 +749,6 @@ a.message__hash {
 }
 
 .me-block span {
-    display: inline-block;
     width: 200px;
 }
 .me-block .svg-icon {
