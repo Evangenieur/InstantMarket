@@ -238,6 +238,7 @@ b {
 .message__content {
   color: #666;
   position: relative;
+  padding-top: 12px;
   padding-bottom: 12px;
 }
 
@@ -310,7 +311,6 @@ a.message__hash {
   position: absolute;
   top: 10px;
   right: 20px;
-  z-index: 5; 
 }
 .panel-animate-enter, .panel-animate-leave { 
     -webkit-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
@@ -561,7 +561,9 @@ a.message__hash {
       bottom: 5px;
       left: 1%;
       right: 1%;
-      margin: 0px; } }
+      margin: 0px;
+      z-index:10px; 
+       } }
 
 .modal__title {
   font-weight: 500;
@@ -635,10 +637,20 @@ a.message__hash {
   padding-left: 10px;
 }
 .notifs {
-  background-color: #f77;
+  background-color: red;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  z-index: +1000;
+  text-align:center;
+  font-size:14px;
 }
 .notif {
-  padding: 5px;  
+  padding: 5px; 
+}
+
+.notif a{
+  color: white;
 }
 
 .me-block {
