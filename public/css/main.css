@@ -53,7 +53,7 @@ b {
   background: #242424;
   position: relative;
   box-shadow: 0 1px 0 black; 
-  padding: 5px;
+  padding: 3px;
 }
   .header:after {
     content: "";
@@ -74,7 +74,7 @@ b {
 
 #city {
   color: white;
-  font-size: 22px;
+  font-size: 18px;
   display: inline-block;
   margin-bottom: 6px;
   vertical-align: bottom;
@@ -317,6 +317,8 @@ a.message__hash {
 .btn.add {
   font-weight:bold;
   float: right;
+  margin-right: 5px;
+  margin-top: -2px;
 }
 .top-bar {
   position: absolute;
@@ -410,10 +412,10 @@ a.message__hash {
 
 .post__message {
     background: white;
-    overflow: hidden;
+    overflow: scroll;
     top: 50%;
     left: 50%;
-    width:50%;
+    width: 50%;
     z-index: +10000;
     margin:auto;
     padding-bottom:10px;
@@ -431,9 +433,7 @@ a.message__hash {
     padding: 0px 0px 0px 20px;
     line-height:30px;
 }
-  @media screen and (max-width: 890px) {
-    .post__message {
-      width: 85%; } }
+
   .post__message textarea {
     width: 250px;
     font-family: "Open sans", sans-serif;
@@ -756,14 +756,9 @@ a.message__hash {
 }
 .me-block hr.whichis {
   padding-bottom: 9px !important;
-
 }
-
 .me-block span {
     width: 200px;
-}
-.me-block .svg-icon {
-
 }
 .me-block label.personal,
 .me-block label.business {
@@ -787,3 +782,30 @@ a.message__hash {
   border: 1px solid #338888;
   border-radius: 5px;
 }
+
+    @media screen and (max-width: 600px) {
+      .me-block,
+      .post__message {
+        font-size: 80%;
+        width: 100%;
+      }
+      .me-block span,
+      .post__message span {
+        display:block;
+        margin-left: 5px;
+      }
+      .me-block hr,
+      .post__message hr {
+        margin-bottom: 0px !important;
+      }
+      .post__message .description {
+        padding: 0px 0px 0px 10px;
+        line-height:22px;
+      }
+      .post__message input[type="text"] {
+        width: 95%;
+      }
+      .post__message h2 {
+        display:none;
+      }
+    }  
