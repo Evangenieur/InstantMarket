@@ -59,7 +59,6 @@ b {
     clear: both; }
 
 .header__logo {
-  text-align: center; 
   font-size: 36px;
   color: #fff;
 }
@@ -67,7 +66,7 @@ b {
     display: inline-block;
     margin: 8px 0;
     vertical-align: text-top;
-    height: 60px    }
+    height: 30px    }
 
 #city {
   color: white;
@@ -102,15 +101,20 @@ b {
     content: "";
     display: table;
     clear: both; }
+  /*
   @media screen and (min-width: 1000px) {
     .tab-bar {
-      display: none; } }
+      display: none; } }*/
   .tab-bar .tab-bar__tab {
     float: left;
-    border-right: 1px solid #ebebeb; }
+    border-right: 1px solid #ebebeb; 
+  }
+
     @media screen and (max-width: 600px) {
       .tab-bar .tab-bar__tab {
-        width: 25%; } }
+        width: 25%; 
+      } 
+    }    
   .tab-bar .tab-bar__link {
     text-transform: uppercase;
     font-size: 12px;
@@ -120,21 +124,22 @@ b {
     text-align: center;
     line-height: 40px;
     text-decoration: none; }
+
     @media screen and (min-width: 600px) {
       .tab-bar .tab-bar__link {
         padding: 0 3em; } }
+
     .tab-bar .tab-bar__link.is-active {
       background: #f5f5f5;
       color: black; }
 
 .tab-pane {
   display: none; }
-  @media screen and (min-width: 1000px) {
+  /*@media screen and (min-width: 1000px) {
     .tab-pane {
-      display: block; } }
+      display: block; } }*/
   .tab-pane.is-active {
     display: block; }
-
 #nav-toggle {
   position: absolute;
   line-height: 40px;
@@ -151,21 +156,21 @@ b {
 
   #nav-toggle {
     display: none; } }
+/*
 .tab-pane-pattern, .chat {
   width: 90%;
   height: 90%;
   margin: 20px auto 0px auto; }
-
-.chat {
-  padding-bottom: 200px; }
-
+*/
 .tab-pane__title {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 1.1em; }
 
 .channels-list {
-  margin-bottom: 30px; }
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
   .channels-list:after {
     content: "";
     display: table;
@@ -200,7 +205,7 @@ b {
   border-right: 1px solid #DDD;
   background: #FFF; }
   .chan.is-active .chan__name {
-    background: #2ecc71;
+    background: #339999;
     border-right: 1px solid rgba(255, 255, 255, 0.3); }
 
 .chan__nb-users, .chan__nb-pois {
@@ -233,9 +238,14 @@ b {
 .message__content {
   color: #666;
   position: relative;
-  padding-bottom: 12px; }
-  .message__content a {
-    color: #2ecc71; }
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.message__content a {
+    color: #AAA;
+    text-decoration:none;
+}
 
 .poi-attach {
   position: absolute;
@@ -283,29 +293,24 @@ a.message__hash {
   background-color: #F70;
 }
 .btn {
-  background-color: #07F;
+  background-color: #339999;
   color: #fff;
   font-size: 13px;
   border: none;
-  border-right: 1px solid black;
-  height: 40px;
-  width: 40%;
+  height: 30px;
+  min-width: 75px;
 }
 .btn.buy {
   background-color: #F70;
 }
 .btn.add {
-  width: 20%;
+  font-weight:bold;
+  float: right;
 }
-.bottom-bar {
-  max-height: 100px;
-  min-height: 40px;
-  position: fixed;
-  bottom: 0px;
-  background: white;
-  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  z-index: 5; 
+.top-bar {
+  position: absolute;
+  top: 10px;
+  right: 20px;
 }
 .panel-animate-enter, .panel-animate-leave { 
     -webkit-transition: 300ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
@@ -331,11 +336,11 @@ a.message__hash {
 
 #panel-add {
   /*display: none;*/
-  background-color: #777;
+  background-color: rgba(0,0,0,0.3);
   position: fixed;  
   bottom: 0px;
   width: 100%;
-  height: 50%;
+  height: 100%;
   z-index: 1; 
 }
 .post {
@@ -393,8 +398,28 @@ a.message__hash {
     color: rgba(255, 255, 255, 0.8); }
 
 .post__message {
-  position: relative;
-  width: 90%; }
+    background: white;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    width:50%;
+    z-index: +10000;
+    margin:auto;
+    padding-bottom:10px;
+}
+
+.post__message h2 {
+    background: black;
+    padding: 13px 35px 8px 31px;
+    text-align: center;
+    margin: 0 0 20px;
+    color: white;
+}
+
+.post__message .description {
+    padding: 0px 0px 0px 20px;
+    line-height:30px;
+}
   @media screen and (max-width: 890px) {
     .post__message {
       width: 85%; } }
@@ -428,7 +453,7 @@ a.message__hash {
   .poi-search__name:hover {
     background: #F2F2F2; }
   .poi-search__name:active {
-    background: #2ecc71;
+    background: #339999;
     color: white; }
 
 .post__poi {
@@ -462,7 +487,7 @@ a.message__hash {
 
 .button-squared, .post__submit {
   text-decoration: none;
-  background: #2ecc71;
+  background: #339999;
   color: white; }
 
 .post__submit {
@@ -498,7 +523,7 @@ a.message__hash {
   height: 90%;
   width: 100%; }
 
-@media screen and (min-width: 1000px) {
+/*@media screen and (min-width: 1000px) {
   .chat {
     width: 50%;
     padding: 0 20px;
@@ -511,7 +536,7 @@ a.message__hash {
     width: 50%;
     float: left;
     position: sticky; } }
-
+*/
 .modal {
   width: 98%;
   max-width: 400px;
@@ -536,7 +561,9 @@ a.message__hash {
       bottom: 5px;
       left: 1%;
       right: 1%;
-      margin: 0px; } }
+      margin: 0px;
+      z-index:10px; 
+       } }
 
 .modal__title {
   font-weight: 500;
@@ -556,13 +583,19 @@ a.message__hash {
 
 .modal__submit {
   border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #2ecc71;
+  background: #339999;
   color: white;
-  cursor: pointer; }
+  cursor: pointer; 
+  float:right;}
 
 .message-list-item {
-  overflow: hidden;
-  max-height: 150px; }
+  margin-bottom: 10px;
+  margin-right: 20px;
+ }
+
+ .message-list-item img{
+  max-height:100px;
+ }
 
 .slide-enter, .slide-leave {
   -webkit-transition: 0.4s cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
@@ -599,4 +632,40 @@ a.message__hash {
 }
 .animate-enter.animate-enter-active{
     top: -100%;
+}
+.chat {
+  padding-left: 10px;
+}
+.notifs {
+  background-color: red;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  z-index: +1000;
+  text-align:center;
+  font-size:14px;
+}
+.notif {
+  padding: 5px; 
+}
+
+.notif a{
+  color: white;
+}
+
+.me-block {
+  font-size: 14px;
+  line-height: 1.4;
+  background: #FFF;
+  padding: .8em 1em;
+  margin: 20px;
+  border: 1px solid #DDD;
+  padding-left: 10px;
+}
+.me-block h1{
+  background: #f5f5f5;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 5px 5px 5px 5px;
+  margin: 0 0 10px;
 }

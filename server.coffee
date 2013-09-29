@@ -88,6 +88,8 @@ require("zappajs") PORT, ->
       "/js/fastclick.js"
       "/js/bundle.js"
       "/js/shared.js"
+      "/js/webrtc.bundle.js"
+      "/js/ua-parser.min.js"
       "/js/script.js"
     ]    
   ).defaults mymarket
@@ -119,7 +121,7 @@ require("zappajs") PORT, ->
     id: "sell"
     name: "sell"
     stats: 
-      users: 0
+      users: 1
       pois: 0
   sharedDoc.Hashtags.add
     id: "buy"
@@ -137,24 +139,45 @@ require("zappajs") PORT, ->
     id: "service"
     name: "service"
     stats: 
-      users: 0
+      users: 1
       pois: 0
   sharedDoc.MarketOrders.add
     id: "test-1"
     author:
+      id: "test"
       link: "link"
       username: "Sniper"
     type: "service"
     direction: "sell"
-    content: "Je vends mon corps"
+    content: "killing joyn with webrtc"
     price: "15€"
     hashtags: ["sell", "service"]
     post_date: new Date()
     poi: 
       name: "Chez oam"
       coord: [48.85445704683003, 2.4362782219366443]
+    chats: [
+     
+    ]
 
+  user_id2socket_id = {}
+  socket_id2user_id = {}
   ### RT COMM ###
   @on connection: ->
     console.log "connected"
     init_crdt_streams_over_socket_io(@socket)
+
+  @on identity: ->
+    console.log "new identity", @data.id, "=", @id
+    user_id2socket_id[@data.id] = @id
+    socket_id2user_id[@id] = @data.id
+
+  # One2One for WebRTC Nego
+  @on message: ->
+    otherClient = @io.sockets.sockets[user_id2socket_id[@data.to]]
+    console.log "message from", @id, @data, otherClient?
+    return unless otherClient
+    delete @data.to
+    @data.from = socket_id2user_id[@id]
+    otherClient.emit "message", @data
+

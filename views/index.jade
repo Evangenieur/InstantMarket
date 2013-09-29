@@ -2,6 +2,11 @@ extends layout
 
 block content
   .app
+      ul.notifs
+        li.notif(ng-repeat="notif in notifs")
+          a(ng-click="set_chat(notif)",href="#") Chat message on bid for {{notif.content}}
+      .top-bar
+          button.btn.add(ng-click="toggleAddOrder()") Submit a bid
       #panel-add(ng-class="{ 'animate-enter': panelAddShow, 'animate-leave': !panelAddShow}")
         form.post(ng-submit="sendMessage()")
           
@@ -11,33 +16,38 @@ block content
           
           .post__message
 
-            span I want to 
-            input(id="buy",type="radio",ng-model="order.direction",value="buy")
-            label(for="buy") Buy
-            span  or 
-            input(id="sell",type="radio",ng-model="order.direction",value="sell")
-            label(for="sell") Sell
-            span  a
-            input(id="service",type="radio",ng-model="order.type",value="service")
-            label(for="service") Service 
-            span  or 
-            input(id="product",type="radio",ng-model="order.type",value="product")
-            label(for="product") Product 
-            span of 
-            input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here")
-            span  for 
-            input(ng-model="message.price",placeholder="enter your price here")
-            span  and it looks like 
-            img(ng-src="{{message.photo}}",width=120)
-            photo-input(file-input="file",on-change="readFile()",)
-            input(type="submit", value="Send", class="modal__submit")
+             h2 Submit a bid
+             div(class="description") I want to 
+                input(id="buy",type="radio",ng-model="order.direction",value="buy")
+                label(for="buy") Buy
+                |  or 
+                input(id="sell",type="radio",ng-model="order.direction",value="sell")
+                label(for="sell") Sell
+                br
+                | A
+                input(id="service",type="radio",ng-model="order.type",value="service")
+                label(for="service") Service 
+                | or
+                input(id="product",type="radio",ng-model="order.type",value="product")
+                label(for="product") Product
+                br
+                | It is a 
+                input(ng-model="message.content", on-focus="inputFocus()",placeholder="Describe your bid here")
+                br
+                | My bid is  
+                input(ng-model="message.price",placeholder="enter your price here")
+                br
+                | and it looks like 
+                photo-input(file-input="file",on-change="readFile()",)
+                img(ng-src="{{message.photo}}",width=120)
+              input(type="submit", value="Submit", class="modal__submit")
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Please enter your name
           input#pseudoprompt(type="text", placeholder="Your name", ng-model="me.username", class="modal__input")
           br
           input(type="submit", value="OK", class="modal__submit")
-    
+              
     tabs(pane-changed="paneChanged(selectedPane)")
       pane(title="List")
         .chat
@@ -57,31 +67,33 @@ block content
               ng-animate=" 'slide' "
             )
             li(class="message {{order.direction}}")
-              img(ng-src="{{order.photo}}",width=120)
-              span.message__user
+              p.message__content
                 a(ng-href="{{order.author.link}}",target="_blank")
                   {{order.author.username}}
-              p.message__content
+                |  is 
+                {{order.direction}}ing
+                |  a 
                 {{order.type}}
-                {{order.direction}}
-                br
+                |  of 
                 span(ng-bind-html-unsafe="order.content")
+                span  for
                 span  
                   b {{order.price}}
                 a(href="#", class="message__hash",
                   ng-repeat='hash in order.hashtags', ng-click="toggleChannel(hash, $event)")
                     # {{ hash }}
+                br
+                img(ng-src="{{order.photo}}",width=120)
                 .rich-content(ng-bind-html-unsafe="order.rich")
+                button(ng-click="set_chat(order)" class="btn") Chat
                 span.poi-attach(ng-if="order.poi.name")
                   i.ss-icon pin
                   {{order.poi.name}}
                 span.timeago(timeago="order.post_date")
 
-        .bottom-bar
-          button.btn.add(ng-click="toggleAddOrder()") Send your bid
 
 
-      pane(title="Map", ng-click="test()")
+      pane(title="Map")
         .map
           google-map(
             center="center", 
@@ -92,34 +104,66 @@ block content
             longitude="selected.longitude", 
             refresh="isMapVisible()", 
             mark-click="true")
-      pane(title="Me")
 
-        h1 Who
-        fieldset
-          legend Username / Company name
-          input(name="username",ng-model="me.username",placeholder="username here")
-          br
-          legend Order Position
-          input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
+      pane(title="About me")
+        div(class="me-block")
+          h1 Who I am
+          fieldset
+            span My name or business name is 
+            input(name="username",ng-model="me.username",placeholder="Your name here")
+            span  and I am located 
+            input(name="position_name",ng-model="me.order.place_name",placeholder="place name")
 
-          span.post__poi(ng-show='poiMessage.name.length > 0')
-            i.ss-icon(ng-click="poiMessage.name = ''") delete
-            {{poiMessage.name}}
-          img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
-          .poi-search(ng-class="{'is-hidden': !poiShow}")
-            i.ss-icon search
-            input#local_search(type="text", class="poi-search__input", placeholder="Recherche ton point d'interet…", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
-            ul.poi-search__results
-              li(ng-repeat="result in poiResults")
-                span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
-        
+            span.post__poi(ng-show='poiMessage.name.length > 0')
+              i.ss-icon(ng-click="poiMessage.name = ''") delete
+              {{poiMessage.name}}
+            
+            img(src="/img/add-poi.svg", class="svg-icon", width="28", ng-click="togglePoiShow()")
+            .poi-search(ng-class="{'is-hidden': !poiShow}")
+              i.ss-icon search
+              input#local_search(type="text", class="poi-search__input", placeholder="Type in your location", ng-model="poiSearch", ng-change="typeahead(poiSearch)")
+              ul.poi-search__results
+                li(ng-repeat="result in poiResults")
+                  span.poi-search__name(ng-click="addPoi(result.name, result.location.lat, result.location.lng)") {{result.name}}
+            
+            span  which is
+            input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
+            label(for="my_position") my personal or
+            input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
+            label(for="company_position") business location          
 
-          input(id="my_position",type="radio",ng-model="me.order.position_type",value="mine")
-          label(for="my_position") My position
-          input(id="company_position",type="radio",ng-model="me.order.position_type",value="company")
-          label(for="company_position") Business location
-
-        h1 My Orders
+        div(class="me-block")
+          h1 My Orders
+      pane(title="Chat", display="chat.show")
+        div(ng-if="chat.order")
+          #chat(ng-controller="ChatCtrl")
+            br
+            ul 
+              li(class="message {{chat.order.direction}}")
+                span.message__user
+                  span.poi-attach(ng-if="chat.order.poi.name")
+                    i.ss-icon pin
+                    {{chat.order.poi.name}}
+                p.message__content
+                  | Chat with 
+                  a(ng-href="{{chat.order.author.link}}",target="_blank")
+                    {{chat.order.author.username}}
+                  |  {{chat.order.direction}}ing 
+                  {{chat.order.type}} 
+                  span(ng-bind-html-unsafe="chat.order.content")
+                  span  for  
+                    b {{chat.order.price}}
+                button(ng-if="me.id != chat.order.author.id",class="btn",ng-click="visio_call()") Visio
+                br
+                br
+                .cams(ng-repeat="user in users")
+                  camera(stream="user.stream",show="cam.activated",autoplay="true",audio="user.audio")
+                ul
+                  li.chat(ng-repeat="chat in chat.order.chats")
+                    | {{chat.author.username}} &gt; {{chat.text}}
+                input(ng-model="text",type="text",enter-submit="sendTxt()")
+                button.btn(ng-click="sendTxt()") Send
+                span.timeago(timeago="chat.order.post_date")
 
 
 
