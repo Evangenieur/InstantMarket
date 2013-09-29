@@ -429,7 +429,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
       hashtags = extractHashtags($scope.message.content).concat [$scope.order.direction, $scope.order.type]
       for hashtag in hashtags
+        console.log "hashtag", hashtag
         doc = $scope.Hashtags.get(hashtag)
+        console.log "doc", doc
         stats = doc.get "stats"
         stats or= {}
         stats.users++
@@ -487,9 +489,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
         switch doc_name
           when "Hashtags"
             $scope[doc_name].on "add", ->
-              $scope.channels = (_(row.state).clone() for id, row of $scope[doc_name].rows)
+              $scope.channels = (row.state for id, row of $scope[doc_name].rows)
             $scope[doc_name].on "remove", ->
-              $scope.channels = (_(row.state).clone() for id, row of $scope[doc_name].rows)
+              $scope.channels = (row.state for id, row of $scope[doc_name].rows)
           when "MarketOrders"
             $scope[doc_name].on "add", ->
               $scope.orders = (row.state for id, row of $scope[doc_name].rows)
@@ -518,9 +520,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).
 
 
       # Reconnect on deco
-      unless first_connection
-        window.location.reload()
-      first_connection = false
+      #unless first_connection
+      #  window.location.reload()
+      #first_connection = false
 
 
       # List Rooms

@@ -496,7 +496,9 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
     hashtags = extractHashtags($scope.message.content).concat([$scope.order.direction, $scope.order.type]);
     for (_i = 0, _len = hashtags.length; _i < _len; _i++) {
       hashtag = hashtags[_i];
+      console.log("hashtag", hashtag);
       doc = $scope.Hashtags.get(hashtag);
+      console.log("doc", doc);
       stats = doc.get("stats");
       stats || (stats = {});
       stats.users++;
@@ -570,7 +572,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                _results.push(_(row.state).clone());
+                _results.push(row.state);
               }
               return _results;
             })();
@@ -583,7 +585,7 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
               _results = [];
               for (id in _ref1) {
                 row = _ref1[id];
-                _results.push(_(row.state).clone());
+                _results.push(row.state);
               }
               return _results;
             })();
@@ -639,10 +641,6 @@ angular.module('mymarket', ["google-maps", "LocalStorageModule"]).directive('tab
       }
     });
     current_channel();
-    if (!first_connection) {
-      window.location.reload();
-    }
-    first_connection = false;
     return socket.emit("list_rooms", function(rooms) {
       var room, _i, _len, _results;
       console.log("list_rooms", rooms);
