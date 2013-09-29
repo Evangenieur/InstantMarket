@@ -298,6 +298,10 @@ a.message__hash {
 .btn:hover, .btn:active {
   background-color: #F70;
 }
+
+.btn:disabled{
+  background-color: grey;
+}
 .btn {
   background-color: #339999;
   color: #fff;
