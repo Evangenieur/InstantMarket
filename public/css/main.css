@@ -761,9 +761,6 @@ a.message__hash {
 .me-block a {
   text-decoration: none;
 }
-.me-block span {
-    width: 200px;
-}
 .me-block label.personal,
 .me-block label.business {
   border: 1px solid #338888;
