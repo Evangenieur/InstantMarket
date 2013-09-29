@@ -18,6 +18,7 @@ block content
              h2 Submit a bid
 
              div(class="description") 
+              form.post(ng-submit="sendMessage()")
                 span I want to 
                 label.buy(for="buy")
                   input(id="buy",type="radio",ng-model="order.direction",value="buy")
@@ -45,7 +46,9 @@ block content
                 span It looks like 
                 photo-input(file-input="file",on-change="readFile()",)
                 img(ng-src="{{message.photo}}",width=120)
-              input(type="submit", value="Submit", class="modal__submit")
+                hr
+                button.btn(type="submit" style="float:left") Submit
+              button.btn(ng-click="toggleAddOrder()" style="float:right") Cancel
 
         form.modal(ng-show="usernamePrompt", ng-submit="sendMessage()")
           h3(class="modal__title") Please enter your name
