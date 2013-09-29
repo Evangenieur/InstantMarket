@@ -64,17 +64,17 @@ b {
 }
   .header__logo img {
     display: inline-block;
-    margin: 8px 0;
+    margin: 8px 8px;
     vertical-align: text-top;
     height: 30px    }
 
 #city {
   color: white;
-  font-size: 26px;
+  font-size: 22px;
   display: inline-block;
   margin-bottom: 10px;
   vertical-align: bottom;
-  margin-left: 10px; }
+  margin-left: 0px; }
 
 #total_connected {
   color: #fff; }
@@ -190,9 +190,10 @@ b {
     color: #212121;
     display: inline-block; }
   .chan.is-active {
-    background: #2bc069;
-    border: 1px solid #28b362;
-    box-shadow: 0 2px 0 #28b362, 0 3px 0 #26ab5e; }
+    background: #333;
+    border: 1px solid #333;
+
+  }
   .chan.is-active a {
     color: white; }
 
