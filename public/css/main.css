@@ -581,10 +581,12 @@ a.message__hash {
   float:right;}
 
 .message-list-item {
-  overflow: hidden;
-  max-height: 150px; 
   margin-bottom: 10px;
   margin-right: 20px;
+ }
+
+ .message-list-item img{
+  max-height:100px;
  }
 
 .slide-enter, .slide-leave {
