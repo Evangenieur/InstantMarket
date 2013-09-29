@@ -137,7 +137,6 @@ block content
       pane(title="Chat", display="chat.show")
         div(ng-if="chat.order")
           #chat(ng-controller="ChatCtrl")
-            br
             ul 
               li(class="message {{chat.order.direction}}")
                 span.message__user
@@ -160,9 +159,11 @@ block content
                   camera(stream="user.stream",show="cam.activated",autoplay="true",audio="user.audio")
                 ul
                   li.chat(ng-repeat="chat in chat.order.chats")
-                    | {{chat.author.username}} &gt; {{chat.text}}
-                input(ng-model="text",type="text",enter-submit="sendTxt()")
-                button.btn(ng-click="sendTxt()") Send
+                    span.author {{chat.author.username}}: 
+                    | {{chat.text}}
+                div.chat-control
+                  input(ng-model="text",type="text",enter-submit="sendTxt()",placeholder="Your message...")
+                  button.btn.submit(ng-click="sendTxt()") Send
                 span.timeago(timeago="chat.order.post_date")
 
 
