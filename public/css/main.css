@@ -666,7 +666,7 @@ a.message__hash {
   line-height: 1.4;
   background: #FFF;
   padding: .8em 1em;
-  margin: 20px;
+  margin: 5px;
   border: 1px solid #DDD;
   padding-left: 10px;
 }
@@ -757,6 +757,10 @@ a.message__hash {
 .me-block hr.whichis {
   padding-bottom: 9px !important;
 }
+
+.me-block a {
+  text-decoration: none;
+}
 .me-block span {
     width: 200px;
 }
@@ -802,10 +806,19 @@ a.message__hash {
         padding: 0px 0px 0px 10px;
         line-height:22px;
       }
+      .me-block .text {
+        width: 95% !important;
+      }
       .post__message input[type="text"] {
-        width: 95%;
+        width: 95% !important;
       }
       .post__message h2 {
         display:none;
+      }
+      .me-block hr.whichis {
+        margin-bottom: 4px;
+      }
+      .me-block label {
+        display: block;
       }
     }  
