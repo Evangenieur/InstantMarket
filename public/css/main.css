@@ -801,4 +801,7 @@ a.message__hash {
       .post__message input[type="text"] {
         width: 95%;
       }
+      .post__message h2 {
+        display:none;
+      }
     }  
